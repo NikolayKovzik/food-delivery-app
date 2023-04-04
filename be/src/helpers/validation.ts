@@ -1,5 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
 import { Types } from 'mongoose';
+import exceptions from '../constants/swagger-exeptions';
 
 const { InvalidIdBadRequest } = exceptions;
 
