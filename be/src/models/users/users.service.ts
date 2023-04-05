@@ -1,0 +1,85 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { isIdValid } from '../../helpers/validation';
+import exceptions from './constants/swagger-exceptions';
+import { UserEntity } from './user.entity';
+import { User, UserDocument } from './user.schema';
+
+const { NotFound } = exceptions;
+
+@Injectable()
+export class UsersService {
+  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+
+  async getAll(): Promise<UserEntity[]> {
+    return await this.userModel.find();
+  }
+
+  async findById(userId: string): Promise<UserEntity> {
+    isIdValid(userId);
+
+    const user = await this.userModel.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException(NotFound);
+    }
+    return user;
+  }
+
+  async getUserByEmail(email: string): Promise<UserEntity> {
+    return await this.userModel.findOne({ email });
+  }
+
+  // async createUser(body: CreateUserDto | RegisterUserDto): Promise<UserEntity> {
+  //   await checkUserForDatabaseMatches(
+  //     body.username,
+  //     body.email,
+  //     this.userModel,
+  //   );
+
+  //   const hashedPassword = await bcrypt.hash(
+  //     body.password,
+  //     parseInt(process.env.CRYPT_SALT),
+  //   );
+
+  //   const newUser = await new this.userModel({
+  //     ...body,
+  //     password: hashedPassword,
+  //   });
+  //   return newUser.save();
+  // }
+
+  async deleteUser(userId: string): Promise<UserEntity> {
+    isIdValid(userId);
+    const deletedUser = await this.userModel.findByIdAndDelete(userId);
+    if (!deletedUser) {
+      throw new NotFoundException(NotFound);
+    }
+    return deletedUser;
+  }
+
+  // async updateUser(
+  //   userId: string,
+  //   updateUserDto: UpdateUserDto,
+  // ): Promise<UserEntity> {
+  //   isIdValid(userId);
+
+  //   await checkUserForDatabaseMatches(
+  //     updateUserDto.username,
+  //     updateUserDto.email,
+  //     this.userModel,
+  //     userId,
+  //   );
+
+  //   const existingUser = await this.userModel.findByIdAndUpdate(
+  //     userId,
+  //     updateUserDto,
+  //     { new: true },
+  //   );
+  //   if (!existingUser) {
+  //     throw new NotFoundException(NotFound);
+  //   }
+  //   return existingUser;
+  // }
+}

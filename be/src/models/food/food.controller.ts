@@ -16,6 +16,7 @@ import {
   ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { StatusCodes } from 'http-status-codes';
@@ -28,6 +29,7 @@ import { FoodService } from './food.service';
 const { UnauthorizedResponse, ForbiddenResponse } = authResponses;
 const { getAllFood, getFoodById, addFood, updateFood, deleteFood } = responses;
 
+@ApiTags('Food')
 @Controller('food')
 export class FoodController {
   constructor(private readonly foodService: FoodService) {}
