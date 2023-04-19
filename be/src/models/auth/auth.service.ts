@@ -2,7 +2,11 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { AuthDto } from './dto/auth.dto';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 
@@ -14,7 +18,7 @@ export class AuthService {
     private configService: ConfigService,
   ) {}
 
-  async signUp(createUserDto: CreateUserDto): Promise<any> {
+  async signUp(createUserDto: CreateUserDto) {
     const userExists = await this.usersService.getUserByEmail(
       createUserDto.email,
     );
@@ -27,7 +31,14 @@ export class AuthService {
       newUser.username,
     );
     await this.updateRefreshToken(newUser._id.toString(), tokens.refreshToken);
-    return tokens;
+    return {
+      tokens,
+      user: {
+        _id: newUser._id,
+        email: newUser.email,
+        username: newUser.username,
+      },
+    };
   }
 
   async signIn(data: AuthDto) {
@@ -44,7 +55,14 @@ export class AuthService {
     const tokens = await this.getTokens(user._id.toString(), user.username);
     await this.updateRefreshToken(user._id.toString(), tokens.refreshToken);
 
-    return tokens;
+    return {
+      tokens,
+      user: {
+        _id: user._id,
+        email: user.email,
+        username: user.username,
+      },
+    };
   }
 
   async logout(userId: string) {
@@ -89,6 +107,33 @@ export class AuthService {
     return {
       accessToken,
       refreshToken,
+    };
+  }
+
+  async refreshTokens(userId: string, refreshToken: string) {
+    const user = await this.usersService.findById(userId);
+    if (!user || !user.refreshToken) {
+      throw new ForbiddenException('Access Denied');
+    }
+
+    const refreshTokenMatches = await bcrypt.compare(
+      refreshToken,
+      user.refreshToken,
+    );
+
+    if (!refreshTokenMatches) {
+      throw new ForbiddenException('Access Denied');
+    }
+
+    const tokens = await this.getTokens(user._id.toString(), user.username);
+    await this.updateRefreshToken(user._id.toString(), tokens.refreshToken);
+    return {
+      tokens,
+      user: {
+        _id: user._id,
+        email: user.email,
+        username: user.username,
+      },
     };
   }
 }

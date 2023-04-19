@@ -6,17 +6,21 @@ import {
   Param,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiConflictResponse,
   ApiCreatedResponse,
+  ApiForbiddenResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-// import authResponses from '../auth/constants/swagger-responses';
+import { AccessTokenGuard } from 'src/guards/accessToken.guard';
+import authResponses from '../auth/constants/swagger-responses';
 import responses from './constants/swagger-responses';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserEntity } from './user.entity';
@@ -25,12 +29,13 @@ import { UsersService } from './users.service';
 const { getAllUsers, getUserById, deleteUser, createUser, updateUser } =
   responses;
 
-// const { UnauthorizedResponse, ForbiddenResponse } = authResponses;
+const { UnauthorizedResponse, ForbiddenResponse } = authResponses;
 
 @ApiTags('Users')
 @ApiBearerAuth()
-// @ApiUnauthorizedResponse(UnauthorizedResponse)
-// @ApiForbiddenResponse(ForbiddenResponse)
+@ApiUnauthorizedResponse(UnauthorizedResponse)
+@ApiForbiddenResponse(ForbiddenResponse)
+@UseGuards(AccessTokenGuard)
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
