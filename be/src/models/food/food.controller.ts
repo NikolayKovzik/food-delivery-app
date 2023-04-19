@@ -29,8 +29,10 @@ import { FoodEntity } from './food.entity';
 import { FoodService } from './food.service';
 
 const { UnauthorizedResponse, ForbiddenResponse } = authResponses;
-const { getAllFood, getFoodById, addFood, updateFood, deleteFood } = responses;
+const { getAllFood, getFoodById, addFood, updateFood, deleteFood, getFilters } =
+  responses;
 
+@ApiBearerAuth()
 @ApiTags('Food')
 @ApiUnauthorizedResponse(UnauthorizedResponse)
 @ApiForbiddenResponse(ForbiddenResponse)
@@ -39,14 +41,12 @@ const { getAllFood, getFoodById, addFood, updateFood, deleteFood } = responses;
 export class FoodController {
   constructor(private readonly foodService: FoodService) {}
 
-  @ApiBearerAuth()
   @ApiOkResponse(getAllFood.ApiOkResponse)
   @Get()
   async getAllFood(): Promise<FoodEntity[]> {
     return await this.foodService.getAllFood();
   }
 
-  @ApiBearerAuth()
   @ApiOkResponse(getFoodById.ApiOkResponse)
   @ApiNotFoundResponse(getFoodById.ApiNotFoundResponse)
   @Get(':id')
@@ -54,7 +54,6 @@ export class FoodController {
     return await this.foodService.getFoodById(id);
   }
 
-  @ApiBearerAuth()
   @ApiCreatedResponse(addFood.ApiCreatedResponse)
   @ApiInternalServerErrorResponse(addFood.ApiInternalServerErrorResponse)
   @Post()
@@ -62,7 +61,6 @@ export class FoodController {
     return await this.foodService.addFood(foodDto);
   }
 
-  @ApiBearerAuth()
   @ApiOkResponse(updateFood.ApiOkResponse)
   @ApiNotFoundResponse(updateFood.ApiNotFoundResponse)
   @ApiInternalServerErrorResponse(updateFood.ApiInternalServerErrorResponse)
@@ -74,7 +72,6 @@ export class FoodController {
     return await this.foodService.updateFood(id, foodDto);
   }
 
-  @ApiBearerAuth()
   @ApiNoContentResponse()
   @ApiNotFoundResponse(deleteFood.ApiNotFoundResponse)
   @ApiInternalServerErrorResponse(deleteFood.ApiInternalServerErrorResponse)
@@ -82,5 +79,12 @@ export class FoodController {
   @Delete(':id')
   async deleteFood(@Param('id') id: string): Promise<void> {
     await this.foodService.deleteFood(id);
+  }
+
+  @ApiOkResponse(getFilters.ApiOkResponse)
+  @ApiNotFoundResponse(getFilters.ApiNotFoundResponse)
+  @Get('filters/type')
+  async getListOfFilters(): Promise<string[]> {
+    return await this.foodService.getListOfFilters();
   }
 }

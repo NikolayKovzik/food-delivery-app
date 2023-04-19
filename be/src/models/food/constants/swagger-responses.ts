@@ -56,6 +56,21 @@ const responses = {
       },
     },
   },
+  getFilters: {
+    ApiOkResponse: {
+      type: 'array',
+      items: {
+        type: 'string',
+      },
+      example: ['spicy', 'salt', 'hot'],
+    },
+    ApiNotFoundResponse: {
+      schema: {
+        type: 'object',
+        example: NotFound,
+      },
+    },
+  },
 };
 
 export default responses;

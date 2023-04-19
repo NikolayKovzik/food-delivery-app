@@ -11,6 +11,9 @@ export class Food {
 
   @Prop({ type: Number, required: true })
   price: number;
+
+  @Prop({ type: String, required: true })
+  type: string;
 }
 
 export type FoodDocument = HydratedDocument<Food>;

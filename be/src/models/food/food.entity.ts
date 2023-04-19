@@ -19,4 +19,9 @@ export class FoodEntity {
     example: 7.5,
   })
   price: number;
+
+  @ApiProperty({
+    example: 'spicy',
+  })
+  type: string;
 }

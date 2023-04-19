@@ -52,4 +52,8 @@ export class FoodService {
       throw new NotFoundException(exceptions.NotFound);
     }
   }
+
+  async getListOfFilters(): Promise<string[]> {
+    return await this.foodModel.distinct('type');
+  }
 }

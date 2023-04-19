@@ -22,4 +22,11 @@ export class FoodDto {
   @IsNotEmpty()
   @IsNumber()
   price: number;
+
+  @ApiProperty({
+    example: 'spicy',
+  })
+  @IsNotEmpty()
+  @IsString()
+  type: string;
 }
