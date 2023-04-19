@@ -1,23 +1,29 @@
-import { Controller, Delete, Get, Param } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
+  ApiConflictResponse,
+  ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
 // import authResponses from '../auth/constants/swagger-responses';
 import responses from './constants/swagger-responses';
+import { CreateUserDto } from './dto/create-user.dto';
 import { UserEntity } from './user.entity';
 import { UsersService } from './users.service';
 
-const {
-  getAllUsers,
-  getUserById,
-  deleteUser,
-  // createUser,
-  // updateUser,
-} = responses;
+const { getAllUsers, getUserById, deleteUser, createUser, updateUser } =
+  responses;
 
 // const { UnauthorizedResponse, ForbiddenResponse } = authResponses;
 
@@ -43,13 +49,13 @@ export class UsersController {
     return await this.usersService.findById(id);
   }
 
-  // @ApiCreatedResponse(createUser.ApiCreatedResponse)
-  // @ApiBadRequestResponse(createUser.ApiBadRequestResponse)
-  // @ApiConflictResponse(createUser.ApiConflictResponse)
-  // @Post()
-  // async createUser(@Body() body: CreateUserDto): Promise<UserEntity> {
-  //   return await this.usersService.createUser(body);
-  // }
+  @ApiCreatedResponse(createUser.ApiCreatedResponse)
+  @ApiBadRequestResponse(createUser.ApiBadRequestResponse)
+  @ApiConflictResponse(createUser.ApiConflictResponse)
+  @Post()
+  async createUser(@Body() body: CreateUserDto): Promise<UserEntity> {
+    return await this.usersService.createUser(body);
+  }
 
   @ApiOkResponse(deleteUser.ApiOkResponse)
   @ApiNotFoundResponse(deleteUser.ApiNotFoundResponse)
@@ -59,15 +65,15 @@ export class UsersController {
     return await this.usersService.deleteUser(userId);
   }
 
-  // @ApiOkResponse(updateUser.ApiOkResponse)
-  // @ApiNotFoundResponse(updateUser.ApiNotFoundResponse)
-  // @ApiBadRequestResponse(updateUser.ApiBadRequestResponse)
-  // @ApiConflictResponse(updateUser.ApiConflictResponse)
-  // @Put('/:id')
-  // async updateUser(
-  //   @Param('id') userId: string,
-  //   @Body() updateUserDto: UpdateUserDto,
-  // ): Promise<UserEntity> {
-  //   return await this.usersService.updateUser(userId, updateUserDto);
-  // }
+  @ApiOkResponse(updateUser.ApiOkResponse)
+  @ApiNotFoundResponse(updateUser.ApiNotFoundResponse)
+  @ApiBadRequestResponse(updateUser.ApiBadRequestResponse)
+  @ApiConflictResponse(updateUser.ApiConflictResponse)
+  @Put('/:id')
+  async updateUser(
+    @Param('id') userId: string,
+    @Body() createUserDto: CreateUserDto,
+  ): Promise<UserEntity> {
+    return await this.usersService.fullUpdateUser(userId, createUserDto);
+  }
 }

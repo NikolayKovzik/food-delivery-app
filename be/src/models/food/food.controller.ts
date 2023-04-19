@@ -20,13 +20,13 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { StatusCodes } from 'http-status-codes';
-import authResponses from '../auth/constants/swagger-responses';
+// import authResponses from '../auth/constants/swagger-responses';
 import responses from './constants/swagger-responses';
 import { FoodDto } from './food.dto';
 import { FoodEntity } from './food.entity';
 import { FoodService } from './food.service';
 
-const { UnauthorizedResponse, ForbiddenResponse } = authResponses;
+// const { UnauthorizedResponse, ForbiddenResponse } = authResponses;
 const { getAllFood, getFoodById, addFood, updateFood, deleteFood } = responses;
 
 @ApiTags('Food')
@@ -35,8 +35,8 @@ export class FoodController {
   constructor(private readonly foodService: FoodService) {}
 
   @ApiBearerAuth()
-  @ApiUnauthorizedResponse(UnauthorizedResponse)
-  @ApiForbiddenResponse(ForbiddenResponse)
+  // @ApiUnauthorizedResponse(UnauthorizedResponse)
+  // @ApiForbiddenResponse(ForbiddenResponse)
   @ApiOkResponse(getAllFood.ApiOkResponse)
   // @UseGuards(JwtAuthGuard)
   @Get()
@@ -45,8 +45,8 @@ export class FoodController {
   }
 
   @ApiBearerAuth()
-  @ApiUnauthorizedResponse(UnauthorizedResponse)
-  @ApiForbiddenResponse(ForbiddenResponse)
+  // @ApiUnauthorizedResponse(UnauthorizedResponse)
+  // @ApiForbiddenResponse(ForbiddenResponse)
   @ApiOkResponse(getFoodById.ApiOkResponse)
   @ApiNotFoundResponse(getFoodById.ApiNotFoundResponse)
   // @UseGuards(JwtAuthGuard)
@@ -56,8 +56,8 @@ export class FoodController {
   }
 
   @ApiBearerAuth()
-  @ApiUnauthorizedResponse(UnauthorizedResponse)
-  @ApiForbiddenResponse(ForbiddenResponse)
+  // @ApiUnauthorizedResponse(UnauthorizedResponse)
+  // @ApiForbiddenResponse(ForbiddenResponse)
   @ApiCreatedResponse(addFood.ApiCreatedResponse)
   @ApiInternalServerErrorResponse(addFood.ApiInternalServerErrorResponse)
   // @UseGuards(JwtAuthGuard)
@@ -67,8 +67,8 @@ export class FoodController {
   }
 
   @ApiBearerAuth()
-  @ApiUnauthorizedResponse(UnauthorizedResponse)
-  @ApiForbiddenResponse(ForbiddenResponse)
+  // @ApiUnauthorizedResponse(UnauthorizedResponse)
+  // @ApiForbiddenResponse(ForbiddenResponse)
   @ApiOkResponse(updateFood.ApiOkResponse)
   @ApiNotFoundResponse(updateFood.ApiNotFoundResponse)
   @ApiInternalServerErrorResponse(updateFood.ApiInternalServerErrorResponse)
@@ -82,8 +82,8 @@ export class FoodController {
   }
 
   @ApiBearerAuth()
-  @ApiUnauthorizedResponse(UnauthorizedResponse)
-  @ApiForbiddenResponse(ForbiddenResponse)
+  // @ApiUnauthorizedResponse(UnauthorizedResponse)
+  // @ApiForbiddenResponse(ForbiddenResponse)
   @ApiNoContentResponse()
   @ApiNotFoundResponse(deleteFood.ApiNotFoundResponse)
   @ApiInternalServerErrorResponse(deleteFood.ApiInternalServerErrorResponse)

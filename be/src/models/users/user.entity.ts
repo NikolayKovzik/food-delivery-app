@@ -13,4 +13,7 @@ export class UserEntity {
 
   @ApiProperty({ example: '1234qaz' })
   password: string;
+
+  @ApiProperty({ example: '1234qaz' })
+  refreshToken: string;
 }
