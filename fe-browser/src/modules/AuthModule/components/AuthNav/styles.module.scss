@@ -1,0 +1,82 @@
+@import '../../../../styles/variables.scss';
+
+.navigation {
+  padding-top: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 0 0 40px 40px;
+  margin-bottom: 33px;
+  overflow: hidden;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.05);
+  img {
+    margin-bottom: 16px;
+  }
+  p {
+    color: $contrast;
+    font-size: 16px;
+    padding-bottom: 10px;
+  }
+
+  .companyName {
+    font-size: 28px;
+    padding-bottom: 5px;
+    font-weight: 700;
+  }
+
+  nav {
+    align-self: stretch;
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0 10%;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+
+    li {
+      min-width: 90px;
+      flex-basis: 45%;
+    }
+
+    a {
+      display: block;
+      text-align: center;
+      text-decoration: none;
+      font-size: 18px;
+
+      padding: 16px 0;
+    }
+    a:hover {
+      box-shadow: inset 0px -2px 0px $primary;
+    }
+  }
+
+  &--light {
+    background-color: $light-theme-bg-contrast;
+    .companyName {
+      color: $light-theme-text;
+    }
+
+    ul {
+      a {
+        color: $dark;
+      }
+    }
+  }
+
+  &--dark {
+    background-color: $dark-theme-bg-contrast;
+    .companyName {
+      color: $dark-theme-text;
+    }
+
+    ul {
+      a {
+        color: $dark-theme-text;
+      }
+    }
+  }
+}

@@ -1,0 +1,34 @@
+$screen-sm: 480px;
+$screen-m: 768px;
+$screen-l: 1024px;
+$screen-xl: 1440px;
+
+@mixin screen-sm {
+  @media (min-width: #{$screen-sm}) {
+    @content;
+  }
+}
+
+@mixin screen-m {
+  @media (min-width: #{$screen-m}) {
+    @content;
+  }
+}
+
+@mixin screen-l {
+  @media (min-width: #{$screen-l}) {
+    @content;
+  }
+}
+
+@mixin screen-xl {
+  @media (min-width: #{$screen-xl}) {
+    @content;
+  }
+}
+
+@mixin screen-min-width($screen) {
+  @media (min-width: $screen) {
+    @content;
+  }
+}
