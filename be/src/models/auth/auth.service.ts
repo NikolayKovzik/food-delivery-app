@@ -8,7 +8,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
-import { CreateUserDto } from '../users/dto/create-user.dto';
+import { UserDto } from '../users/dto/user.dto';
 
 @Injectable()
 export class AuthService {
@@ -18,14 +18,12 @@ export class AuthService {
     private configService: ConfigService,
   ) {}
 
-  async signUp(createUserDto: CreateUserDto) {
-    const userExists = await this.usersService.getUserByEmail(
-      createUserDto.email,
-    );
+  async signUp(userDto: UserDto) {
+    const userExists = await this.usersService.getUserByEmail(userDto.email);
     if (userExists) {
       throw new BadRequestException('User already exists');
     }
-    const newUser = await this.usersService.createUser(createUserDto);
+    const newUser = await this.usersService.createUser(userDto);
     const tokens = await this.getTokens(
       newUser._id.toString(),
       newUser.username,

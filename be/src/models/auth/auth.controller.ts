@@ -3,7 +3,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { AccessTokenGuard } from 'src/guards/accessToken.guard';
 import { RefreshTokenGuard } from 'src/guards/refreshToken.guard';
-import { CreateUserDto } from '../users/dto/create-user.dto';
+import { UserDto } from '../users/dto/user.dto';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth.dto';
 
@@ -13,8 +13,8 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('signup')
-  signup(@Body() createUserDto: CreateUserDto) {
-    return this.authService.signUp(createUserDto);
+  signup(@Body() userDto: UserDto) {
+    return this.authService.signUp(userDto);
   }
 
   @Post('signin')

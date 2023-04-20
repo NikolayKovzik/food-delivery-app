@@ -1,4 +1,4 @@
-import { UserEntity } from '../user.entity';
+import { PublicUserEntity } from '../user.entites';
 import exceptions from './swagger-exceptions';
 
 const { InvalidIdBadRequest, InvalidBodyBadRequest, NotFound, Conflict } =
@@ -6,10 +6,10 @@ const { InvalidIdBadRequest, InvalidBodyBadRequest, NotFound, Conflict } =
 
 const responses = {
   getAllUsers: {
-    ApiOkResponse: { type: UserEntity, isArray: true },
+    ApiOkResponse: { type: PublicUserEntity, isArray: true },
   },
   getUserById: {
-    ApiOkResponse: { type: UserEntity },
+    ApiOkResponse: { type: PublicUserEntity },
     ApiNotFoundResponse: {
       schema: {
         type: 'object',
@@ -26,7 +26,7 @@ const responses = {
     },
   },
   createUser: {
-    ApiCreatedResponse: { type: UserEntity },
+    ApiCreatedResponse: { type: PublicUserEntity },
     ApiBadRequestResponse: {
       schema: {
         type: 'object',
@@ -44,7 +44,7 @@ const responses = {
   },
   deleteUser: {
     ApiOkResponse: {
-      type: UserEntity,
+      type: PublicUserEntity,
       description: 'User was successfully deleted',
     },
     ApiNotFoundResponse: {
@@ -64,7 +64,7 @@ const responses = {
   },
   updateUser: {
     ApiOkResponse: {
-      type: UserEntity,
+      type: PublicUserEntity,
       description: 'User has been  successfully updated',
     },
     ApiNotFoundResponse: {

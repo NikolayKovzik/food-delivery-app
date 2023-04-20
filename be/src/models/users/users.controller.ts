@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   Param,
-  Post,
   Put,
   UseGuards,
 } from '@nestjs/common';
@@ -12,7 +11,6 @@ import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiConflictResponse,
-  ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -22,12 +20,11 @@ import {
 import { AccessTokenGuard } from 'src/guards/accessToken.guard';
 import authResponses from '../auth/constants/swagger-responses';
 import responses from './constants/swagger-responses';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UserEntity } from './user.entity';
+import { UserDto } from './dto/user.dto';
+import { PublicUserEntity } from './user.entites';
 import { UsersService } from './users.service';
 
-const { getAllUsers, getUserById, deleteUser, createUser, updateUser } =
-  responses;
+const { getAllUsers, getUserById, deleteUser, updateUser } = responses;
 
 const { UnauthorizedResponse, ForbiddenResponse } = authResponses;
 
@@ -42,7 +39,7 @@ export class UsersController {
 
   @ApiOkResponse(getAllUsers.ApiOkResponse)
   @Get()
-  async getAllUsers(): Promise<UserEntity[]> {
+  async getAllUsers(): Promise<PublicUserEntity[]> {
     return await this.usersService.getAll();
   }
 
@@ -50,23 +47,15 @@ export class UsersController {
   @ApiNotFoundResponse(getUserById.ApiNotFoundResponse)
   @ApiBadRequestResponse(getUserById.ApiBadRequestResponse)
   @Get(':id')
-  async getUserById(@Param('id') id: string): Promise<UserEntity> {
-    return await this.usersService.findById(id);
-  }
-
-  @ApiCreatedResponse(createUser.ApiCreatedResponse)
-  @ApiBadRequestResponse(createUser.ApiBadRequestResponse)
-  @ApiConflictResponse(createUser.ApiConflictResponse)
-  @Post()
-  async createUser(@Body() body: CreateUserDto): Promise<UserEntity> {
-    return await this.usersService.createUser(body);
+  async getUserById(@Param('id') id: string): Promise<PublicUserEntity> {
+    return await this.usersService.publicFindById(id);
   }
 
   @ApiOkResponse(deleteUser.ApiOkResponse)
   @ApiNotFoundResponse(deleteUser.ApiNotFoundResponse)
   @ApiBadRequestResponse(deleteUser.ApiBadRequestResponse)
   @Delete('/:id')
-  async deleteUser(@Param('id') userId: string): Promise<UserEntity> {
+  async deleteUser(@Param('id') userId: string): Promise<PublicUserEntity> {
     return await this.usersService.deleteUser(userId);
   }
 
@@ -77,8 +66,8 @@ export class UsersController {
   @Put('/:id')
   async updateUser(
     @Param('id') userId: string,
-    @Body() createUserDto: CreateUserDto,
-  ): Promise<UserEntity> {
-    return await this.usersService.fullUpdateUser(userId, createUserDto);
+    @Body() userDto: UserDto,
+  ): Promise<PublicUserEntity> {
+    return await this.usersService.publicUpdateUser(userId, userDto);
   }
 }

@@ -7,11 +7,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { isIdValid } from '../../helpers/validation';
 import exceptions from './constants/swagger-exceptions';
-import { CreateUserDto } from './dto/create-user.dto';
+import { UserDto } from './dto/user.dto';
 import * as bcrypt from 'bcrypt';
-import { UserEntity } from './user.entity';
+import {
+  FullUserEntity,
+  PartialUserEntity,
+  PublicUserEntity,
+} from './user.entites';
 import { User, UserDocument } from './user.schema';
-import { UpdateUserDto } from './dto/update-user.dto';
 
 const { NotFound, Conflict } = exceptions;
 
@@ -19,11 +22,11 @@ const { NotFound, Conflict } = exceptions;
 export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
-  async getAll(): Promise<UserEntity[]> {
-    return await this.userModel.find();
+  async getAll(): Promise<PublicUserEntity[]> {
+    return await this.userModel.find({}, { password: 0, refreshToken: 0 });
   }
 
-  async findById(userId: string): Promise<UserEntity> {
+  async findById(userId: string): Promise<FullUserEntity> {
     isIdValid(userId);
 
     const user = await this.userModel.findById(userId);
@@ -34,11 +37,22 @@ export class UsersService {
     return user;
   }
 
-  async getUserByEmail(email: string): Promise<UserEntity> {
+  async publicFindById(userId: string): Promise<PublicUserEntity> {
+    const user = await this.findById(userId);
+    return {
+      _id: user._id,
+      email: user.email,
+      username: user.username,
+    };
+  }
+
+  async getUserByEmail(email: string): Promise<FullUserEntity> {
     return await this.userModel.findOne({ email });
   }
 
-  async createUser(body: CreateUserDto): Promise<UserEntity> {
+  async createUser(
+    body: UserDto,
+  ): Promise<Omit<FullUserEntity, 'refreshToken'>> {
     await this.checkUserForDatabaseMatches(body.username, body.email);
     const hashedPassword = await bcrypt.hash(
       body.password,
@@ -51,32 +65,32 @@ export class UsersService {
     return newUser.save();
   }
 
-  async deleteUser(userId: string): Promise<UserEntity> {
+  async deleteUser(userId: string): Promise<PublicUserEntity> {
     isIdValid(userId);
-    const deletedUser = await this.userModel.findByIdAndDelete(userId);
+    const deletedUser = await this.userModel
+      .findByIdAndDelete(userId)
+      .select('-password -refreshToken');
     if (!deletedUser) {
       throw new NotFoundException(NotFound);
     }
     return deletedUser;
   }
 
-  async fullUpdateUser(
+  async publicUpdateUser(
     userId: string,
-    createUserDto: CreateUserDto,
-  ): Promise<UserEntity> {
+    userDto: UserDto,
+  ): Promise<PublicUserEntity> {
     isIdValid(userId);
 
     await this.checkUserForDatabaseMatches(
-      createUserDto.username,
-      createUserDto.email,
+      userDto.username,
+      userDto.email,
       userId,
     );
 
-    const existingUser = await this.userModel.findByIdAndUpdate(
-      userId,
-      createUserDto,
-      { new: true },
-    );
+    const existingUser = await this.userModel
+      .findByIdAndUpdate(userId, userDto, { new: true })
+      .select('-password -refreshToken');
     if (!existingUser) {
       throw new NotFoundException(NotFound);
     }
@@ -85,13 +99,13 @@ export class UsersService {
 
   async partialUpdateUser(
     userId: string,
-    updateUserDto: UpdateUserDto,
-  ): Promise<UserEntity> {
+    userEntity: PartialUserEntity,
+  ): Promise<FullUserEntity> {
     isIdValid(userId);
 
     const existingUser = await this.userModel.findByIdAndUpdate(
       userId,
-      updateUserDto,
+      userEntity,
       { new: true },
     );
     if (!existingUser) {
