@@ -13,6 +13,9 @@ export class Food {
   price: number;
 
   @Prop({ type: String, required: true })
+  image: string;
+
+  @Prop({ type: String, required: true })
   type: string;
 }
 

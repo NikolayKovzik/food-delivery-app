@@ -1,5 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Types } from 'mongoose';
+import { config } from 'dotenv';
+
+config();
 
 export class FoodEntity {
   @ApiProperty({ example: '6407588c77660290910cfd16' })
@@ -19,6 +22,13 @@ export class FoodEntity {
     example: 7.5,
   })
   price: number;
+
+  @ApiProperty({
+    example: `${process.env.APP_HOSTNAME}:${
+      process.env.PORT ? process.env.PORT : ''
+    }/assets/food/fried_rice.jpg`,
+  })
+  image: string;
 
   @ApiProperty({
     example: 'spicy',
