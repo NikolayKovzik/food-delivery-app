@@ -7,19 +7,27 @@ import { useAppDispatch, useAppSelector } from '../../../../hooks/redux'
 import { themeActions } from '../../../../redux/slices/themeSlice'
 import { useNavigate } from 'react-router-dom'
 import RoutesList from '../../../../routes/routes'
+import { authActions } from '../../slices/authSlice'
 
 function SignupForm() {
   const { showPassword, eyeButtonElement } = usePasswordVisibility()
 
-  const { register, handleSubmit, reset } = useForm<signupFormValues>()
+  const { register, handleSubmit, reset, setError, clearErrors } = useForm<signupFormValues>()
 
+  const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
   const handleSave = (formValues: signupFormValues) => {
-    console.log(formValues)
+    if (formValues['confirm password'] !== formValues.password) {
+      setError('password', new Error('passwords are not match'))
+      console.error('passwords do not match')
+      return
+    }
 
+    const { password, email, username } = formValues
+    dispatch(authActions.signUp({ password, email, username }))
     navigate(RoutesList.DEFAULT, { replace: true })
-
+    clearErrors()
     reset()
   }
   const { theme } = useAppSelector((state) => state.theme)

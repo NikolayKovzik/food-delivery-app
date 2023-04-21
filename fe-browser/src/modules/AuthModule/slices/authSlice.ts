@@ -1,79 +1,68 @@
 /* eslint-disable no-duplicate-imports */
-import { createSlice } from '@reduxjs/toolkit'
-import type { PayloadAction } from '@reduxjs/toolkit'
+import { PayloadAction, createSlice } from '@reduxjs/toolkit'
+import { User } from '../../../types/user'
+import { LoginDto, SignUpDto } from '../../../types/auth'
 
 export interface AuthState {
   isAuthorized: boolean
   loading: boolean
   success: boolean
   error: string | null
-  // user: User | null
+  user: User | null
 }
 
 const initialState: AuthState = {
-  isAuthorized: true,
+  isAuthorized: !!localStorage.getItem('accessToken'),
   loading: false,
   success: false,
   error: null,
-  // user: null,
+  user: null,
 }
 
 export const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    // logout: (state) => {
-    //   localStorage.removeItem(localStorageTokenKey);
-    //   state.user = null;
-    //   state.isAuthorized = false;
-    // },
+    signUp: (state, action: PayloadAction<SignUpDto>) => {
+      state.loading = true
+    },
+
+    signUpSuccess: (state, action: PayloadAction<User>) => {
+      state.isAuthorized = true
+      state.user = action.payload
+    },
+
+    login: (state, action: PayloadAction<LoginDto>) => {
+      state.loading = true
+    },
+
+    loginSuccess: (state, action: PayloadAction<User>) => {
+      state.isAuthorized = true
+      state.user = action.payload
+    },
+
+    logout: (state) => {
+      state.loading = true
+    },
+
+    logoutSuccess: (state) => {
+      state.isAuthorized = false
+      state.user = null
+    },
+
+    resetLoading: (state) => {
+      state.loading = false
+    },
+
+    setError: (state, action: PayloadAction<string>) => {
+      state.error = action.payload
+    },
     resetError: (state) => {
       state.error = null
     },
     resetSuccess: (state) => {
       state.success = false
     },
-  },
-  extraReducers: (builder) => {
-    // builder.addCase(registerUser.pending, (state) => {
-    //   state.loading = true;
-    //   state.error = null;
-    //   state.success = false;
-    // });
-    // builder.addCase(registerUser.fulfilled, (state, action: PayloadAction<AuthResponse>) => {
-    //   state.loading = false;
-    //   localStorage.setItem(localStorageTokenKey, action.payload.token);
-    //   state.user = action.payload.user;
-    //   state.isAuthorized = true;
-    //   state.success = true;
-    // });
-    // builder.addCase(loginUser.pending, (state) => {
-    //   state.loading = true;
-    //   state.error = null;
-    //   state.success = false;
-    // });
-    // builder.addCase(loginUser.fulfilled, (state, action: PayloadAction<AuthResponse>) => {
-    //   state.loading = false;
-    //   localStorage.setItem(localStorageTokenKey, action.payload.token);
-    //   state.user = action.payload.user;
-    //   state.isAuthorized = true;
-    //   state.success = true;
-    // });
-    // builder.addCase(checkAuth.pending, (state) => {
-    //   state.loading = true;
-    //   state.error = null;
-    // });
-    // builder.addCase(checkAuth.fulfilled, (state, action: PayloadAction<AuthResponse>) => {
-    //   state.loading = false;
-    //   localStorage.setItem(localStorageTokenKey, action.payload.token);
-    //   state.user = action.payload.user;
-    //   state.isAuthorized = true;
-    // });
-    // builder.addMatcher(isError, (state, action: PayloadAction<string>) => {
-    //   state.loading = false;
-    //   state.error = action.payload;
-    //   state.success = false;
-    // });
   },
 })
 

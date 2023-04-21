@@ -4,6 +4,7 @@ import styles from './styles.module.scss'
 import { Card } from '../Card'
 import { CardType } from '../../types'
 import axios from 'axios'
+import { $authApi } from '../../http/api'
 
 function CardList({ cardsData }: ICardListProps) {
   const [cards, setCards] = useState<CardType[]>([] as CardType[])
@@ -11,7 +12,7 @@ function CardList({ cardsData }: ICardListProps) {
   useEffect(() => {
     try {
       ;(async () => {
-        const { data } = await axios.get<CardType[]>('http://localhost:4001/food')
+        const { data } = await $authApi.get<CardType[]>('food')
         setCards(data)
       })()
     } catch (error) {

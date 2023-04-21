@@ -2,21 +2,26 @@ import React from 'react'
 import { useForm } from 'react-hook-form'
 import { loginFormValues } from './types'
 import usePasswordVisibility from '../../../../hooks/usePasswordVisibility'
-import { useAppSelector } from '../../../../hooks/redux'
+import { useAppDispatch, useAppSelector } from '../../../../hooks/redux'
 import { useLocation, useNavigate } from 'react-router-dom'
 import RoutesList from '../../../../routes/routes'
+import { authActions } from '../../slices/authSlice'
 
 function LoginForm() {
   const { showPassword, eyeButtonElement } = usePasswordVisibility()
-  const { register, handleSubmit, reset } = useForm<loginFormValues>()
+  const { register, handleSubmit, reset, clearErrors } = useForm<loginFormValues>()
 
   const navigate = useNavigate()
   const location = useLocation()
+  const dispatch = useAppDispatch()
 
   const handleSave = (formValues: loginFormValues) => {
-    console.log(formValues)
+    const { password, email } = formValues
+    dispatch(authActions.login({ password, email }))
+
     const origin = location.state?.from?.pathname || RoutesList.DEFAULT
     navigate(origin, { replace: true })
+    clearErrors()
     reset()
   }
 
