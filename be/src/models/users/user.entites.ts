@@ -16,6 +16,15 @@ export class FullUserEntity {
 
   @ApiProperty({ example: '1234qaz' })
   refreshToken: string;
+
+  @ApiProperty({
+    example: [
+      '64427a7714c2de82f8b93891',
+      '64427ad614c2de82f8b93893',
+      '644243d59a30fd843d831717',
+    ],
+  })
+  favoriteFood: string[];
 }
 
 export class PartialUserEntity {
@@ -30,6 +39,15 @@ export class PartialUserEntity {
 
   @ApiProperty({ example: '1234qaz' })
   refreshToken?: string;
+
+  @ApiProperty({
+    example: [
+      '64427a7714c2de82f8b93891',
+      '64427ad614c2de82f8b93893',
+      '644243d59a30fd843d831717',
+    ],
+  })
+  favoriteFood?: string[];
 }
 
 export class PublicUserEntity {
@@ -41,4 +59,13 @@ export class PublicUserEntity {
 
   @ApiProperty({ example: 'hans@mail.ru' })
   email: string;
+
+  @ApiProperty({
+    example: [
+      '64427a7714c2de82f8b93891',
+      '64427ad614c2de82f8b93893',
+      '644243d59a30fd843d831717',
+    ],
+  })
+  favoriteFood?: string[];
 }

@@ -23,43 +23,58 @@ export class AuthService {
     if (userExists) {
       throw new BadRequestException('User already exists');
     }
+
     const newUser = await this.usersService.createUser(userDto);
     const tokens = await this.getTokens(
       newUser._id.toString(),
       newUser.username,
     );
+
     await this.updateRefreshToken(newUser._id.toString(), tokens.refreshToken);
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...publicUserData } = JSON.parse(JSON.stringify(newUser));
+    console.log(JSON.stringify(publicUserData));
     return {
       tokens,
-      user: {
-        _id: newUser._id,
-        email: newUser.email,
-        username: newUser.username,
-      },
+      user: publicUserData,
     };
   }
 
   async signIn(data: AuthDto) {
-    const user = await this.usersService.getUserByEmail(data.email);
+    const userExists = await this.usersService.getUserByEmail(data.email);
 
-    if (!user) {
+    if (!userExists) {
       throw new BadRequestException('User does not exist');
     }
-    const passwordMatches = await bcrypt.compare(data.password, user.password);
+
+    const passwordMatches = await bcrypt.compare(
+      data.password,
+      userExists.password,
+    );
 
     if (!passwordMatches) {
       throw new BadRequestException('Password is incorrect');
     }
-    const tokens = await this.getTokens(user._id.toString(), user.username);
-    await this.updateRefreshToken(user._id.toString(), tokens.refreshToken);
+
+    const tokens = await this.getTokens(
+      userExists._id.toString(),
+      userExists.username,
+    );
+
+    await this.updateRefreshToken(
+      userExists._id.toString(),
+      tokens.refreshToken,
+    );
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, refreshToken, ...publicUserData } = JSON.parse(
+      JSON.stringify(userExists),
+    );
 
     return {
       tokens,
-      user: {
-        _id: user._id,
-        email: user.email,
-        username: user.username,
-      },
+      user: publicUserData,
     };
   }
 
@@ -108,30 +123,39 @@ export class AuthService {
     };
   }
 
-  async refreshTokens(userId: string, refreshToken: string) {
-    const user = await this.usersService.findById(userId);
-    if (!user || !user.refreshToken) {
+  async refreshTokens(userId: string, oldRefreshToken: string) {
+    const userExists = await this.usersService.findById(userId);
+    if (!userExists || !userExists.refreshToken) {
       throw new ForbiddenException('Access Denied');
     }
 
     const refreshTokenMatches = await bcrypt.compare(
-      refreshToken,
-      user.refreshToken,
+      oldRefreshToken,
+      userExists.refreshToken,
     );
 
     if (!refreshTokenMatches) {
       throw new ForbiddenException('Access Denied');
     }
 
-    const tokens = await this.getTokens(user._id.toString(), user.username);
-    await this.updateRefreshToken(user._id.toString(), tokens.refreshToken);
+    const newTokens = await this.getTokens(
+      userExists._id.toString(),
+      userExists.username,
+    );
+
+    await this.updateRefreshToken(
+      userExists._id.toString(),
+      newTokens.refreshToken,
+    );
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, refreshToken, ...publicUserData } = JSON.parse(
+      JSON.stringify(userExists),
+    );
+
     return {
-      tokens,
-      user: {
-        _id: user._id,
-        email: user.email,
-        username: user.username,
-      },
+      tokens: newTokens,
+      user: publicUserData,
     };
   }
 }

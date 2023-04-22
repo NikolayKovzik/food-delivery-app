@@ -43,12 +43,15 @@ export class UsersService {
   }
 
   async publicFindById(userId: string): Promise<PublicUserEntity> {
-    const user = await this.findById(userId);
-    return {
-      _id: user._id,
-      email: user.email,
-      username: user.username,
-    };
+    const user = await this.userModel.findById(userId, {
+      password: 0,
+      refreshToken: 0,
+    });
+
+    if (!user) {
+      throw new NotFoundException(NotFound);
+    }
+    return user;
   }
 
   async getUserByEmail(email: string): Promise<FullUserEntity> {
@@ -56,7 +59,9 @@ export class UsersService {
   }
 
   async getUserFavoriteFood(userId: string): Promise<string[]> {
-    const user = await this.userModel.findById(userId).populate('favoriteFood');
+    const user = await this.userModel
+      .findById(userId, { password: 0, refreshToken: 0 })
+      .populate('favoriteFood');
     return user.favoriteFood;
   }
 
@@ -115,7 +120,7 @@ export class UsersService {
       ...body,
       password: hashedPassword,
     });
-    return newUser.save();
+    return await newUser.save();
   }
 
   async deleteUser(userId: string): Promise<PublicUserEntity> {
