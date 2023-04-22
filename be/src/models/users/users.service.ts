@@ -6,7 +6,8 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { isIdValid } from '../../helpers/validation';
-import exceptions from './constants/swagger-exceptions';
+import userExceptions from './constants/swagger-exceptions';
+import foodExceptions from '../food/constants/swagger-exceptions';
 import { UserDto } from './dto/user.dto';
 import * as bcrypt from 'bcrypt';
 import {
@@ -15,12 +16,16 @@ import {
   PublicUserEntity,
 } from './user.entites';
 import { User, UserDocument } from './user.schema';
+import { Food, FoodDocument } from '../food/food.schema';
 
-const { NotFound, Conflict } = exceptions;
+const { NotFound, Conflict } = userExceptions;
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+  constructor(
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
+    @InjectModel(Food.name) private foodModel: Model<FoodDocument>,
+  ) {}
 
   async getAll(): Promise<PublicUserEntity[]> {
     return await this.userModel.find({}, { password: 0, refreshToken: 0 });
@@ -48,6 +53,54 @@ export class UsersService {
 
   async getUserByEmail(email: string): Promise<FullUserEntity> {
     return await this.userModel.findOne({ email });
+  }
+
+  async getUserFavoriteFood(userId: string): Promise<string[]> {
+    const user = await this.userModel.findById(userId).populate('favoriteFood');
+    return user.favoriteFood;
+  }
+
+  async addUserFavoriteFoodItem(userId: string, foodId: string): Promise<Food> {
+    const favFoodItem = await this.foodModel.findById(foodId);
+    if (!favFoodItem) {
+      throw new NotFoundException(foodExceptions.NotFound);
+    }
+
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new NotFoundException(userExceptions.NotFound);
+    }
+
+    await user.updateOne({
+      $addToSet: {
+        favoriteFood: foodId,
+      },
+    });
+
+    return favFoodItem;
+  }
+
+  async removeUserFavoriteFoodItem(
+    userId: string,
+    foodId: string,
+  ): Promise<Food> {
+    const favFoodItem = await this.foodModel.findById(foodId);
+    if (!favFoodItem) {
+      throw new NotFoundException(userExceptions.NotFound);
+    }
+
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new NotFoundException(userExceptions.NotFound);
+    }
+
+    await user.updateOne({
+      $pull: {
+        favoriteFood: foodId,
+      },
+    });
+
+    return favFoodItem;
   }
 
   async createUser(

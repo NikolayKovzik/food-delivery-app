@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Put,
   UseGuards,
 } from '@nestjs/common';
@@ -49,6 +50,27 @@ export class UsersController {
   @Get(':id')
   async getUserById(@Param('id') id: string): Promise<PublicUserEntity> {
     return await this.usersService.publicFindById(id);
+  }
+
+  @Get(':id/favorite-food')
+  async getUserFavoriteFood(@Param('id') userId: string) {
+    return await this.usersService.getUserFavoriteFood(userId);
+  }
+
+  @Patch(':userId/favorite-food/:foodId/add')
+  async addUserFavoriteFoodItem(
+    @Param('userId') userId: string,
+    @Param('foodId') foodId: string,
+  ) {
+    return await this.usersService.addUserFavoriteFoodItem(userId, foodId);
+  }
+
+  @Patch(':userId/favorite-food/:foodId/delete')
+  async removeUserFavoriteFoodItem(
+    @Param('userId') userId: string,
+    @Param('foodId') foodId: string,
+  ) {
+    return await this.usersService.removeUserFavoriteFoodItem(userId, foodId);
   }
 
   @ApiOkResponse(deleteUser.ApiOkResponse)
