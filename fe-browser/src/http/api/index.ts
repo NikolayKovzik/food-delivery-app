@@ -1,6 +1,6 @@
 import axios, { InternalAxiosRequestConfig } from 'axios'
 
-const BASE_URL = 'http://localhost:4001'
+const BASE_URL = 'https://food-delivery-app-production.up.railway.app'
 
 export const $authApi = axios.create({
   baseURL: BASE_URL,
