@@ -25,6 +25,11 @@ export class FullUserEntity {
     ],
   })
   favoriteFood: string[];
+
+  @ApiProperty({
+    example: ['644243d59a30fd843d831717'],
+  })
+  cart: string[];
 }
 
 export class PartialUserEntity {
@@ -48,6 +53,11 @@ export class PartialUserEntity {
     ],
   })
   favoriteFood?: string[];
+
+  @ApiProperty({
+    example: ['644243d59a30fd843d831717'],
+  })
+  cart?: string[];
 }
 
 export class PublicUserEntity {
@@ -67,5 +77,10 @@ export class PublicUserEntity {
       '644243d59a30fd843d831717',
     ],
   })
-  favoriteFood?: string[];
+  favoriteFood: string[];
+
+  @ApiProperty({
+    example: ['644243d59a30fd843d831717'],
+  })
+  cart: string[];
 }

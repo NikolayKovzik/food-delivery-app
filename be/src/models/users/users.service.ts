@@ -108,6 +108,57 @@ export class UsersService {
     return favFoodItem;
   }
 
+  async getUserCart(userId: string): Promise<string[]> {
+    const user = await this.userModel
+      .findById(userId, { password: 0, refreshToken: 0 })
+      .populate('cart');
+    return user.cart;
+  }
+
+  async addFoodItemToCart(userId: string, foodId: string): Promise<Food> {
+    const foodItem = await this.foodModel.findById(foodId);
+    if (!foodItem) {
+      throw new NotFoundException(foodExceptions.NotFound);
+    }
+
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new NotFoundException(userExceptions.NotFound);
+    }
+
+    await user.updateOne({
+      $push: {
+        cart: foodId,
+      },
+    });
+
+    // const elemCount = await this.userModel.count({
+    //   cart: { $elemMatch: { foodId } },
+    // });
+
+    return foodItem;
+  }
+
+  async removeFoodItemFromCart(userId: string, foodId: string): Promise<Food> {
+    const foodItem = await this.foodModel.findById(foodId);
+    if (!foodItem) {
+      throw new NotFoundException(userExceptions.NotFound);
+    }
+
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new NotFoundException(userExceptions.NotFound);
+    }
+
+    await user.updateOne({
+      $pull: {
+        cart: foodId,
+      },
+    });
+
+    return foodItem;
+  }
+
   async createUser(
     body: UserDto,
   ): Promise<Omit<FullUserEntity, 'refreshToken'>> {

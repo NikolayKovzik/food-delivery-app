@@ -17,6 +17,9 @@ export class User {
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Food' }] })
   favoriteFood: string[];
+
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Food' }] })
+  cart: string[];
 }
 
 export type UserDocument = HydratedDocument<User>;

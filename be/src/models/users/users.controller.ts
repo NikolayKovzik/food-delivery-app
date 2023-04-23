@@ -73,6 +73,27 @@ export class UsersController {
     return await this.usersService.removeUserFavoriteFoodItem(userId, foodId);
   }
 
+  @Get(':id/cart')
+  async getUserCart(@Param('id') userId: string) {
+    return await this.usersService.getUserCart(userId);
+  }
+
+  @Patch(':userId/cart/:foodId/add')
+  async addFoodItemToCart(
+    @Param('userId') userId: string,
+    @Param('foodId') foodId: string,
+  ) {
+    return await this.usersService.addFoodItemToCart(userId, foodId);
+  }
+
+  @Patch(':userId/cart/:foodId/delete')
+  async removeFoodItemFromCart(
+    @Param('userId') userId: string,
+    @Param('foodId') foodId: string,
+  ) {
+    return await this.usersService.removeFoodItemFromCart(userId, foodId);
+  }
+
   @ApiOkResponse(deleteUser.ApiOkResponse)
   @ApiNotFoundResponse(deleteUser.ApiNotFoundResponse)
   @ApiBadRequestResponse(deleteUser.ApiBadRequestResponse)

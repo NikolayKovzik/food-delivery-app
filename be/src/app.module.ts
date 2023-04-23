@@ -6,6 +6,7 @@ import { UsersModule } from './models/users/users.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { AuthModule } from './models/auth/auth.module';
 import { join } from 'path';
+import { FiltersModule } from './models/filters/filters.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { join } from 'path';
     FoodModule,
     UsersModule,
     AuthModule,
+    FiltersModule,
   ],
 })
 export class AppModule {}
