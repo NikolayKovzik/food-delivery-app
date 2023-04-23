@@ -1,6 +1,6 @@
 export type CardType = {
   cardId: string
-  imgSrc: string
+  image: string
   price: number
   moneySign: string
   name: string

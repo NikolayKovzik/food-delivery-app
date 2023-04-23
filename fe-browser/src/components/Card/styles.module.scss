@@ -18,11 +18,13 @@
     font-weight: 700;
     font-size: 14px;
     text-transform: capitalize;
+    white-space: nowrap;
   }
 
   .description {
     color: $contrast;
     font-size: 8px;
+    white-space: nowrap;
   }
 
   .price-wrapper {

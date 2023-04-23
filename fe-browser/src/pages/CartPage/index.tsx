@@ -13,7 +13,7 @@ function CartPage() {
         {cartOrders.map((item, index) => {
           return (
             <li key={index}>
-              <img src={item.imgSrc} alt='' />
+              <img src={item.image} alt='' />
               <p>{item.name}</p>
               <p>{item.description}</p>
               <div>

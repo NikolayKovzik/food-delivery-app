@@ -10,7 +10,6 @@ function MenuLayout() {
     <div>
       <MainHeader />
       <Search />
-      <Chips />
       <Outlet />
       <MainNav />
     </div>

@@ -1,0 +1,52 @@
+@import '../../styles/variables.scss';
+.footer__wrapper{
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  padding: 0 var(--primary-padding) 0;
+  background: var(--light-bg);
+
+}
+.footer__container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  //border-radius: 20px 0px 40px;
+  height: 50px;
+  min-width: 320px;
+  max-width: 450px;
+  margin: auto;
+  background: var(--light-bg);
+  li {
+    a {
+      &.active {
+        fill: var(--primary);
+      }
+    }
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+  .center{
+    position: relative;
+    background: #f2f6f7;
+  }
+  .center-icon-container{
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    position: absolute;
+    border: 2px solid var(--light-bg);
+    background: var(--primary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    left: -25px;
+    top: -50px;
+    li{
+      height: 20px;
+    }
+  }
+}

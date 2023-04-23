@@ -1,26 +1,48 @@
 import React from 'react'
+import { ReactSVG } from 'react-svg'
 import { NavLink } from 'react-router-dom'
-import styles from './styles.module.scss'
+
+import './styles.scss'
+
+import homeIcon from '../../assets/images/material_icons/home.svg'
+import favoriteIcon from '../../assets/images/material_icons/favorite.svg'
+import notificationIcon from '../../assets/images/material_icons/notifications.svg'
+import personIcon from '../../assets/images/material_icons/person.svg'
+import shoppingIcon from '../../assets/images/material_icons/shopping.svg'
 
 function MainNav() {
   return (
-    <ul className={styles['main-nav']}>
-      <li>
-        <NavLink to='#'>Home</NavLink>
-      </li>
-      <li>
-        <NavLink to='#'>Favorites</NavLink>
-      </li>
-      <li>
-        <NavLink to='#'>Cart</NavLink>
-      </li>
-      <li>
-        <NavLink to='#'>Notifications</NavLink>
-      </li>
-      <li>
-        <NavLink to='#'>Profile</NavLink>
-      </li>
-    </ul>
+    <div className='footer__wrapper'>
+      <ul className='footer__container'>
+        <li>
+          <NavLink to='/'>
+            <ReactSVG src={homeIcon} />
+          </NavLink>
+        </li>
+        <li>
+          <NavLink to='favorite'>
+            <ReactSVG src={favoriteIcon} />
+          </NavLink>
+        </li>
+        <li className='center'>
+          <div className='center-icon-container'>
+            <NavLink to='order'>
+              <ReactSVG src={shoppingIcon} />
+            </NavLink>
+          </div>
+        </li>
+        <li>
+          <NavLink to='notification'>
+            <ReactSVG src={notificationIcon} />
+          </NavLink>
+        </li>
+        <li>
+          <NavLink to='profile'>
+            <ReactSVG src={personIcon} />
+          </NavLink>
+        </li>
+      </ul>
+    </div>
   )
 }
 

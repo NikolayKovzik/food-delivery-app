@@ -1,0 +1,20 @@
+@import 'src/styles/variables';
+.main-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px var(--primary-padding) 10px;
+  color: $primary-text;
+  h1{
+    color: var(--primaryText);
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 36px;
+    max-width: 165px;
+  }
+  .main__icon{
+    border-radius: 50%;
+    width: 55px;
+    height: 55px;
+    align-self: center;
+  }
+}

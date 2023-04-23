@@ -7,11 +7,12 @@ import { useAppSelector } from '../../hooks/redux'
 function Card({ card }: ICardProps) {
   const { addFavoriteElement } = useFavorite()
   const { theme } = useAppSelector((state) => state.theme)
+
   return (
     <div className={`${styles.card} ${styles[`card--${theme}`]}`}>
       <p className={styles.name}>{card.name}</p>
       <div className={styles['image-wrapper']}>
-        <img className={styles['main-img']} src={card.imgSrc} alt={card.name} />
+        <img className={styles['main-img']} src={card.image} alt={card.name} />
         <button className={styles['add-favorite']}>{addFavoriteElement}</button>
       </div>
       <p className={styles.description}>{card.description}</p>

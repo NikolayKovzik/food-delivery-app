@@ -4,7 +4,7 @@ export const mockCards: CardType[] = [
   {
     cardId: '1',
     description: 'spicy food',
-    imgSrc: testImg,
+    image: testImg,
     isFavorite: false,
     moneySign: '$',
     name: 'dumpligs',
@@ -13,7 +13,7 @@ export const mockCards: CardType[] = [
   {
     cardId: '2',
     description: 'spicy food',
-    imgSrc: testImg,
+    image: testImg,
     isFavorite: false,
     moneySign: '$',
     name: 'dumpligs',
@@ -22,7 +22,7 @@ export const mockCards: CardType[] = [
   {
     cardId: '3',
     description: 'spicy food',
-    imgSrc: testImg,
+    image: testImg,
     isFavorite: false,
     moneySign: '$',
     name: 'dumpligs',

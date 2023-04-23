@@ -1,10 +1,12 @@
 import React from 'react'
-import styles from './styles.module.scss'
+import profileLogo from '../../assets/images/beaty_man.png'
+import './styles.scss'
+
 function MainHeader() {
   return (
-    <div className={styles['main-header']}>
-      <p>Let&#39;s eat Quality food</p>
-      <img className={styles['user-avatar']} src='#' alt='user avatar' />
+    <div className='main-header'>
+      <h1>Let&#39;s eat Quality food</h1>
+      <img className='main__icon' src={profileLogo} alt='user avatar' />
     </div>
   )
 }

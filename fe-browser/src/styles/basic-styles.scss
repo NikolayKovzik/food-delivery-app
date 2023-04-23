@@ -7,6 +7,12 @@
   scroll-behavior: smooth;
 }
 
+:root {
+  --primary-padding: 23px;
+  --primary:#fdc27a;
+  --light-bg:#FFFFFF;
+}
+
 h1,
 h2,
 h3,
@@ -51,6 +57,7 @@ body {
     &--light {
       background-color: $light-theme-bg;
     }
+
     &--dark {
       background-color: $dark-theme-bg;
     }
@@ -74,11 +81,13 @@ textarea:focus-visible {
 
 .auth__form {
   padding: 30px;
+
   .form__group {
     margin-bottom: 17px;
     position: relative;
     display: flex;
     flex-direction: column;
+
     &--eye {
       button {
         position: absolute;
@@ -87,14 +96,17 @@ textarea:focus-visible {
       }
     }
   }
+
   .forgot {
     font-size: 13px;
     font-weight: 700;
   }
+
   label {
     color: $contrast;
     font-size: 12px;
   }
+
   input {
     font-weight: 500;
     padding: 10px 0;
@@ -120,15 +132,18 @@ textarea:focus-visible {
     .forgot {
       color: $light-theme-text;
     }
+
     input {
       border-bottom: 1px solid $light-theme-text;
       color: $light-theme-text;
     }
   }
+
   &--dark {
     .forgot {
       color: $dark-theme-text;
     }
+
     input {
       border-bottom: 1px solid $dark-theme-text;
       color: $dark-theme-text;

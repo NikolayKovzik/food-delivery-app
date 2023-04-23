@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { ICardListProps } from './types'
-import styles from './styles.module.scss'
+import './styles.scss'
 import { Card } from '../Card'
 import { CardType } from '../../types'
 import axios from 'axios'
@@ -19,8 +19,9 @@ function CardList({ cardsData }: ICardListProps) {
       console.log(error)
     }
   }, [])
+
   return (
-    <ul className={styles['card-list']}>
+    <ul className='card-list'>
       {cards.map((item, index) => {
         return (
           <li key={index}>
