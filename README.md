@@ -6,8 +6,8 @@
 
 ### application launch
 
-**BE: ** cd be -> npm i -> npm run start:dev
-**FE: ** cd fe-browser -> npm i -> npm run start
+* **BE:** cd be -> npm i -> npm run start:dev
+* **FE:** cd fe-browser -> npm i -> npm run start
 
 ### deploy links
 
