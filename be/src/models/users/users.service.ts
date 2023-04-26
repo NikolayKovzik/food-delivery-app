@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { isIdValid } from '../../helpers/validation';
 import userExceptions from './constants/swagger-exceptions';
 import foodExceptions from '../food/constants/swagger-exceptions';
@@ -115,7 +115,7 @@ export class UsersService {
     return user.cart;
   }
 
-  async addFoodItemToCart(userId: string, foodId: string): Promise<Food> {
+  async addFoodItemToCart(userId: string, foodId: string): Promise<any> {
     const foodItem = await this.foodModel.findById(foodId);
     if (!foodItem) {
       throw new NotFoundException(foodExceptions.NotFound);
@@ -132,11 +132,29 @@ export class UsersService {
       },
     });
 
-    // const elemCount = await this.userModel.count({
-    //   cart: { $elemMatch: { foodId } },
-    // });
-
-    return foodItem;
+    const [{ foodItemCount }] = await this.userModel.aggregate([
+      {
+        $match: {
+          _id: new mongoose.Types.ObjectId(userId),
+        },
+      },
+      {
+        $project: { _id: 0, cart: 1 },
+      },
+      { $unwind: '$cart' },
+      {
+        $match: {
+          cart: new mongoose.Types.ObjectId(foodId),
+        },
+      },
+      {
+        $count: 'foodItemCount',
+      },
+    ]);
+    return {
+      foodItem,
+      foodItemCount,
+    };
   }
 
   async removeFoodItemFromCart(userId: string, foodId: string): Promise<Food> {
