@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -79,11 +80,12 @@ export class UsersController {
   }
 
   @Patch(':userId/cart/:foodId/add')
-  async addFoodItemToCart(
+  async addFoodItemsToCart(
     @Param('userId') userId: string,
     @Param('foodId') foodId: string,
+    @Query('count') amount: number,
   ) {
-    return await this.usersService.addFoodItemToCart(userId, foodId);
+    return await this.usersService.addFoodItemsToCart(userId, foodId, amount);
   }
 
   @Patch(':userId/cart/:foodId/delete')

@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Types } from 'mongoose';
+import { Cart } from './schemes/cart.schema';
 
 export class FullUserEntity {
   @ApiProperty({ example: '6407588c77660290910cfd16' })
@@ -27,9 +28,9 @@ export class FullUserEntity {
   favoriteFood: string[];
 
   @ApiProperty({
-    example: ['644243d59a30fd843d831717'],
+    example: { foodItemId: '644243d59a30fd843d831717', foodItemAmount: 3 },
   })
-  cart: string[];
+  cart: Cart[];
 }
 
 export class PartialUserEntity {
@@ -55,9 +56,9 @@ export class PartialUserEntity {
   favoriteFood?: string[];
 
   @ApiProperty({
-    example: ['644243d59a30fd843d831717'],
+    example: { foodItemId: '644243d59a30fd843d831717', foodItemAmount: 3 },
   })
-  cart?: string[];
+  cart?: Cart[];
 }
 
 export class PublicUserEntity {
@@ -80,7 +81,7 @@ export class PublicUserEntity {
   favoriteFood: string[];
 
   @ApiProperty({
-    example: ['644243d59a30fd843d831717'],
+    example: { foodItemId: '644243d59a30fd843d831717', foodItemAmount: 3 },
   })
-  cart: string[];
+  cart: Cart[];
 }

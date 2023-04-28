@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import mongoose, { Model } from 'mongoose';
+import { Model } from 'mongoose';
 import { isIdValid } from '../../helpers/validation';
 import userExceptions from './constants/swagger-exceptions';
 import foodExceptions from '../food/constants/swagger-exceptions';
@@ -15,7 +15,7 @@ import {
   PartialUserEntity,
   PublicUserEntity,
 } from './user.entites';
-import { User, UserDocument } from './user.schema';
+import { User, UserDocument } from './schemes/user.schema';
 import { Food, FoodDocument } from '../food/food.schema';
 
 const { NotFound, Conflict } = userExceptions;
@@ -108,15 +108,42 @@ export class UsersService {
     return favFoodItem;
   }
 
-  async getUserCart(userId: string): Promise<string[]> {
+  async getUserCart(userId: string): Promise<any> {
+    // const user = await this.userModel.aggregate([
+    //   {
+    //     $match: {
+    //       _id: new mongoose.Types.ObjectId(userId),
+    //     },
+    //   },
+    //   { $unwind: '$cart' },
+    //   {
+    //     $group: {
+    //       _id: '$cart',
+    //       foodItemAmount: { $sum: 1 },
+    //     },
+    //   },
+    //   {
+    //     $project: {
+    //       _id: 0,
+    //       foodItem: '$_id',
+    //       foodItemAmount: 1,
+    //     },
+    //   },
+    // ]);
+    // return this.foodModel.populate(user, { path: 'foodItem' });
     const user = await this.userModel
       .findById(userId, { password: 0, refreshToken: 0 })
-      .populate('cart');
+      .populate('cart.foodItem');
     return user.cart;
   }
 
-  async addFoodItemToCart(userId: string, foodId: string): Promise<any> {
-    const foodItem = await this.foodModel.findById(foodId);
+  async addFoodItemsToCart(
+    userId: string,
+    foodItemId: string,
+    foodItemAmount: number,
+  ): Promise<{ foodItem: Food; foodItemAmount: number }> {
+    const foodItem = await this.foodModel.findById(foodItemId);
+    console.log(foodItemAmount);
     if (!foodItem) {
       throw new NotFoundException(foodExceptions.NotFound);
     }
@@ -126,34 +153,42 @@ export class UsersService {
       throw new NotFoundException(userExceptions.NotFound);
     }
 
-    await user.updateOne({
-      $push: {
-        cart: foodId,
-      },
-    });
-
-    const [{ foodItemCount }] = await this.userModel.aggregate([
+    await this.userModel.updateOne({ _id: userId }, [
       {
-        $match: {
-          _id: new mongoose.Types.ObjectId(userId),
+        $set: {
+          cart: {
+            $cond: [
+              { $in: [foodItemId, '$cart.foodItem'] },
+              {
+                $map: {
+                  input: '$cart',
+                  in: {
+                    $cond: [
+                      { $eq: ['$$this.foodItem', foodItemId] },
+                      {
+                        foodItem: '$$this.foodItem',
+                        foodItemAmount: { $add: ['$$this.foodItemAmount', 1] },
+                      },
+                      '$$this',
+                    ],
+                  },
+                },
+              },
+              {
+                $concatArrays: [
+                  '$cart',
+                  [{ foodItem: foodItemId, foodItemAmount: 1 }],
+                ],
+              },
+            ],
+          },
         },
-      },
-      {
-        $project: { _id: 0, cart: 1 },
-      },
-      { $unwind: '$cart' },
-      {
-        $match: {
-          cart: new mongoose.Types.ObjectId(foodId),
-        },
-      },
-      {
-        $count: 'foodItemCount',
       },
     ]);
+
     return {
       foodItem,
-      foodItemCount,
+      foodItemAmount,
     };
   }
 
