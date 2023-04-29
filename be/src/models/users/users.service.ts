@@ -119,14 +119,14 @@ export class UsersService {
     //   {
     //     $group: {
     //       _id: '$cart',
-    //       foodItemAmount: { $sum: 1 },
+    //       foodItemCounter: { $sum: 1 },
     //     },
     //   },
     //   {
     //     $project: {
     //       _id: 0,
     //       foodItem: '$_id',
-    //       foodItemAmount: 1,
+    //       foodItemCounter: 1,
     //     },
     //   },
     // ]);
@@ -140,10 +140,10 @@ export class UsersService {
   async addFoodItemsToCart(
     userId: string,
     foodItemId: string,
-    foodItemAmount: number,
-  ): Promise<{ foodItem: Food; foodItemAmount: number }> {
+    amountOfFoodItems: number,
+  ): Promise<{ foodItem: Food; totalAmountOfFoodInCart: number }> {
     const foodItem = await this.foodModel.findById(foodItemId);
-    console.log(foodItemAmount);
+    console.log(amountOfFoodItems);
     if (!foodItem) {
       throw new NotFoundException(foodExceptions.NotFound);
     }
@@ -167,7 +167,9 @@ export class UsersService {
                       { $eq: ['$$this.foodItem', foodItemId] },
                       {
                         foodItem: '$$this.foodItem',
-                        foodItemAmount: { $add: ['$$this.foodItemAmount', 1] },
+                        foodItemCounter: {
+                          $add: ['$$this.foodItemCounter', amountOfFoodItems],
+                        },
                       },
                       '$$this',
                     ],
@@ -177,7 +179,12 @@ export class UsersService {
               {
                 $concatArrays: [
                   '$cart',
-                  [{ foodItem: foodItemId, foodItemAmount: 1 }],
+                  [
+                    {
+                      foodItem: foodItemId,
+                      foodItemCounter: amountOfFoodItems,
+                    },
+                  ],
                 ],
               },
             ],
@@ -188,12 +195,16 @@ export class UsersService {
 
     return {
       foodItem,
-      foodItemAmount,
+      totalAmountOfFoodInCart: 0,
     };
   }
 
-  async removeFoodItemFromCart(userId: string, foodId: string): Promise<Food> {
-    const foodItem = await this.foodModel.findById(foodId);
+  async removeFoodItemFromCart(
+    userId: string,
+    foodItemId: string,
+    amountOfFoodItems: number,
+  ): Promise<Food> {
+    const foodItem = await this.foodModel.findById(foodItemId);
     if (!foodItem) {
       throw new NotFoundException(userExceptions.NotFound);
     }
@@ -203,11 +214,70 @@ export class UsersService {
       throw new NotFoundException(userExceptions.NotFound);
     }
 
-    await user.updateOne({
-      $pull: {
-        cart: foodId,
+    await this.userModel.updateOne({ _id: userId }, [
+      {
+        $set: {
+          cart: {
+            //   $cond: [
+            //     { $in: [foodItemId, '$cart.foodItem'] },
+            //     {
+            $map: {
+              input: '$cart',
+              in: {
+                $cond: [
+                  { $eq: ['$$this.foodItem', foodItemId] },
+                  {
+                    $cond: {
+                      if: {
+                        $lte: [
+                          {
+                            $subtract: [
+                              '$$this.foodItemCounter',
+                              amountOfFoodItems,
+                            ],
+                          },
+                          0,
+                        ],
+                      },
+                      // {
+                      //   foodItem: '$$this.foodItem',
+                      //   foodItemCounter: 0,
+                      // },
+                      then: '$$REMOVE',
+                      else: {
+                        foodItem: '$$this.foodItem',
+                        foodItemCounter: {
+                          $subtract: [
+                            '$$this.foodItemCounter',
+                            amountOfFoodItems,
+                          ],
+                        },
+                      },
+                    },
+                  },
+                  '$$this',
+                ],
+              },
+            },
+            //   },
+            //   '$cart',
+            // ],
+          },
+        },
       },
-    });
+      {
+        $set: {
+          cart: {
+            $filter: {
+              input: '$cart',
+              cond: {
+                $ne: ['$$this', null],
+              },
+            },
+          },
+        },
+      },
+    ]);
 
     return foodItem;
   }

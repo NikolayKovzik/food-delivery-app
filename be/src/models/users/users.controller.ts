@@ -83,17 +83,26 @@ export class UsersController {
   async addFoodItemsToCart(
     @Param('userId') userId: string,
     @Param('foodId') foodId: string,
-    @Query('count') amount: number,
+    @Query('amount') amountOfFoodItems: string,
   ) {
-    return await this.usersService.addFoodItemsToCart(userId, foodId, amount);
+    return await this.usersService.addFoodItemsToCart(
+      userId,
+      foodId,
+      +amountOfFoodItems,
+    );
   }
 
   @Patch(':userId/cart/:foodId/delete')
   async removeFoodItemFromCart(
     @Param('userId') userId: string,
     @Param('foodId') foodId: string,
+    @Query('amount') amountOfFoodItems: string,
   ) {
-    return await this.usersService.removeFoodItemFromCart(userId, foodId);
+    return await this.usersService.removeFoodItemFromCart(
+      userId,
+      foodId,
+      +amountOfFoodItems,
+    );
   }
 
   @ApiOkResponse(deleteUser.ApiOkResponse)
