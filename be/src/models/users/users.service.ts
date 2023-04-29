@@ -218,60 +218,42 @@ export class UsersService {
       {
         $set: {
           cart: {
-            //   $cond: [
-            //     { $in: [foodItemId, '$cart.foodItem'] },
-            //     {
-            $map: {
+            $reduce: {
               input: '$cart',
+              initialValue: [],
               in: {
                 $cond: [
-                  { $eq: ['$$this.foodItem', foodItemId] },
                   {
-                    $cond: {
-                      if: {
-                        $lte: [
-                          {
-                            $subtract: [
-                              '$$this.foodItemCounter',
-                              amountOfFoodItems,
-                            ],
-                          },
-                          0,
+                    $eq: ['$$this.foodItem', foodItemId],
+                  },
+                  {
+                    $cond: [
+                      { $gt: ['$$this.foodItemCounter', amountOfFoodItems] },
+                      {
+                        $concatArrays: [
+                          '$$value',
+                          [
+                            {
+                              $mergeObjects: [
+                                '$$this',
+                                {
+                                  foodItemCounter: {
+                                    $subtract: [
+                                      '$$this.foodItemCounter',
+                                      amountOfFoodItems,
+                                    ],
+                                  },
+                                },
+                              ],
+                            },
+                          ],
                         ],
                       },
-                      // {
-                      //   foodItem: '$$this.foodItem',
-                      //   foodItemCounter: 0,
-                      // },
-                      then: '$$REMOVE',
-                      else: {
-                        foodItem: '$$this.foodItem',
-                        foodItemCounter: {
-                          $subtract: [
-                            '$$this.foodItemCounter',
-                            amountOfFoodItems,
-                          ],
-                        },
-                      },
-                    },
+                      '$$value',
+                    ],
                   },
-                  '$$this',
+                  { $concatArrays: ['$$value', ['$$this']] },
                 ],
-              },
-            },
-            //   },
-            //   '$cart',
-            // ],
-          },
-        },
-      },
-      {
-        $set: {
-          cart: {
-            $filter: {
-              input: '$cart',
-              cond: {
-                $ne: ['$$this', null],
               },
             },
           },
