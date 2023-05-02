@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { isIdValid } from '../../helpers/validation';
 import userExceptions from './constants/swagger-exceptions';
 import foodExceptions from '../food/constants/swagger-exceptions';
@@ -108,6 +108,67 @@ export class UsersService {
     return favFoodItem;
   }
 
+  async addFoodToCartFromMainPage(
+    userId: string,
+    foodItemId: string,
+  ): Promise<number> {
+    const foodItem = await this.foodModel.findById(foodItemId);
+
+    if (!foodItem) {
+      throw new NotFoundException(foodExceptions.NotFound);
+    }
+
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new NotFoundException(userExceptions.NotFound);
+    }
+
+    await this.addFoodItemsToCart(userId, foodItemId, 1);
+
+    return await this.getTotalNumberOfFoodInCart(userId);
+  }
+
+  async getTotalNumberOfFoodInCart(userId: string): Promise<number> {
+    const [{ totalNumberOfFoodInCart }] = await this.userModel.aggregate([
+      {
+        $match: {
+          _id: new mongoose.Types.ObjectId(userId),
+        },
+      },
+      {
+        $group: {
+          _id: '$temp',
+          totalNumberOfFoodInCart: {
+            $sum: { $sum: '$cart.foodItemCounter' },
+          },
+        },
+      },
+    ]);
+
+    return totalNumberOfFoodInCart;
+  }
+
+  async addFoodToCartFromDetailsPage(
+    userId: string,
+    foodItemId: string,
+    amountOfFoodItems: number,
+  ): Promise<number> {
+    const foodItem = await this.foodModel.findById(foodItemId);
+
+    if (!foodItem) {
+      throw new NotFoundException(foodExceptions.NotFound);
+    }
+
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new NotFoundException(userExceptions.NotFound);
+    }
+
+    await this.addFoodItemsToCart(userId, foodItemId, amountOfFoodItems);
+
+    return await this.getTotalNumberOfFoodInCart(userId);
+  }
+
   async getUserCart(userId: string): Promise<any> {
     // const user = await this.userModel.aggregate([
     //   {
@@ -141,18 +202,7 @@ export class UsersService {
     userId: string,
     foodItemId: string,
     amountOfFoodItems: number,
-  ): Promise<{ foodItem: Food; totalAmountOfFoodInCart: number }> {
-    const foodItem = await this.foodModel.findById(foodItemId);
-    console.log(amountOfFoodItems);
-    if (!foodItem) {
-      throw new NotFoundException(foodExceptions.NotFound);
-    }
-
-    const user = await this.userModel.findById(userId);
-    if (!user) {
-      throw new NotFoundException(userExceptions.NotFound);
-    }
-
+  ): Promise<void> {
     await this.userModel.updateOne({ _id: userId }, [
       {
         $set: {
@@ -192,18 +242,14 @@ export class UsersService {
         },
       },
     ]);
-
-    return {
-      foodItem,
-      totalAmountOfFoodInCart: 0,
-    };
   }
 
-  async removeFoodItemFromCart(
+  async removeFoodItemsFromCart(
     userId: string,
     foodItemId: string,
     amountOfFoodItems: number,
-  ): Promise<Food> {
+  ): Promise<void> {
+    //!delete or replace this checks
     const foodItem = await this.foodModel.findById(foodItemId);
     if (!foodItem) {
       throw new NotFoundException(userExceptions.NotFound);
@@ -260,8 +306,6 @@ export class UsersService {
         },
       },
     ]);
-
-    return foodItem;
   }
 
   async createUser(

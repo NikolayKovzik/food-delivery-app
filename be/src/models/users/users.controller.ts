@@ -79,13 +79,21 @@ export class UsersController {
     return await this.usersService.getUserCart(userId);
   }
 
-  @Patch(':userId/cart/:foodId/add')
-  async addFoodItemsToCart(
+  @Patch(':userId/cart/:foodId/add-to-cart-from-main-page')
+  async addFoodToCartFromMainPage(
+    @Param('userId') userId: string,
+    @Param('foodId') foodId: string,
+  ): Promise<number> {
+    return await this.usersService.addFoodToCartFromMainPage(userId, foodId);
+  }
+
+  @Patch(':userId/cart/:foodId/add-to-cart-from-details-page')
+  async addFoodToCartFromDetailsPage(
     @Param('userId') userId: string,
     @Param('foodId') foodId: string,
     @Query('amount') amountOfFoodItems: string,
-  ) {
-    return await this.usersService.addFoodItemsToCart(
+  ): Promise<number> {
+    return await this.usersService.addFoodToCartFromDetailsPage(
       userId,
       foodId,
       +amountOfFoodItems,
@@ -93,12 +101,12 @@ export class UsersController {
   }
 
   @Patch(':userId/cart/:foodId/delete')
-  async removeFoodItemFromCart(
+  async removeFoodItemsFromCart(
     @Param('userId') userId: string,
     @Param('foodId') foodId: string,
     @Query('amount') amountOfFoodItems: string,
   ) {
-    return await this.usersService.removeFoodItemFromCart(
+    return await this.usersService.removeFoodItemsFromCart(
       userId,
       foodId,
       +amountOfFoodItems,
