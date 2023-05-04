@@ -34,7 +34,7 @@ const { UnauthorizedResponse, ForbiddenResponse } = authResponses;
 @ApiBearerAuth()
 @ApiUnauthorizedResponse(UnauthorizedResponse)
 @ApiForbiddenResponse(ForbiddenResponse)
-@UseGuards(AccessTokenGuard)
+// @UseGuards(AccessTokenGuard)
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -84,7 +84,11 @@ export class UsersController {
     @Param('userId') userId: string,
     @Param('foodId') foodId: string,
   ): Promise<number> {
-    return await this.usersService.addFoodToCartFromMainPage(userId, foodId);
+    return await this.usersService.addFoodToCartAndGetTotalAmount(
+      userId,
+      foodId,
+      1,
+    );
   }
 
   @Patch(':userId/cart/:foodId/add-to-cart-from-details-page')
@@ -93,12 +97,31 @@ export class UsersController {
     @Param('foodId') foodId: string,
     @Query('amount') amountOfFoodItems: string,
   ): Promise<number> {
-    return await this.usersService.addFoodToCartFromDetailsPage(
+    return await this.usersService.addFoodToCartAndGetTotalAmount(
       userId,
       foodId,
       +amountOfFoodItems,
     );
   }
+
+  // @Patch(':userId/cart/:foodId/add-food-to-cart-from-order-page')
+  // async addFoodToCartFromOrderPage(
+  //   @Param('userId') userId: string,
+  //   @Param('foodId') foodId: string,
+  // ): Promise<number> {
+  //   return await this.usersService.addFoodToCartFromOrderPage(userId, foodId);
+  // }
+
+  // @Patch(':userId/cart/:foodId/remove-food-from-cart-from-order-page')
+  // async removeFoodFromCartFromOrderPage(
+  //   @Param('userId') userId: string,
+  //   @Param('foodId') foodId: string,
+  // ): Promise<number> {
+  //   return await this.usersService.removeFoodFromCartFromOrderPage(
+  //     userId,
+  //     foodId,
+  //   );
+  // }
 
   @Patch(':userId/cart/:foodId/delete')
   async removeFoodItemsFromCart(

@@ -36,7 +36,7 @@ const { getAllFood, getFoodById, addFood, updateFood, deleteFood, getFilters } =
 @ApiTags('Food')
 @ApiUnauthorizedResponse(UnauthorizedResponse)
 @ApiForbiddenResponse(ForbiddenResponse)
-@UseGuards(AccessTokenGuard)
+// @UseGuards(AccessTokenGuard)
 @Controller('food')
 export class FoodController {
   constructor(private readonly foodService: FoodService) {}

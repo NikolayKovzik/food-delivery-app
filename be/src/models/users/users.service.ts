@@ -108,9 +108,10 @@ export class UsersService {
     return favFoodItem;
   }
 
-  async addFoodToCartFromMainPage(
+  async addFoodToCartAndGetTotalAmount(
     userId: string,
     foodItemId: string,
+    amountOfFoodItems: number,
   ): Promise<number> {
     const foodItem = await this.foodModel.findById(foodItemId);
 
@@ -123,7 +124,7 @@ export class UsersService {
       throw new NotFoundException(userExceptions.NotFound);
     }
 
-    await this.addFoodItemsToCart(userId, foodItemId, 1);
+    await this.addFoodItemsToCart(userId, foodItemId, amountOfFoodItems);
 
     return await this.getTotalNumberOfFoodInCart(userId);
   }
@@ -146,27 +147,6 @@ export class UsersService {
     ]);
 
     return totalNumberOfFoodInCart;
-  }
-
-  async addFoodToCartFromDetailsPage(
-    userId: string,
-    foodItemId: string,
-    amountOfFoodItems: number,
-  ): Promise<number> {
-    const foodItem = await this.foodModel.findById(foodItemId);
-
-    if (!foodItem) {
-      throw new NotFoundException(foodExceptions.NotFound);
-    }
-
-    const user = await this.userModel.findById(userId);
-    if (!user) {
-      throw new NotFoundException(userExceptions.NotFound);
-    }
-
-    await this.addFoodItemsToCart(userId, foodItemId, amountOfFoodItems);
-
-    return await this.getTotalNumberOfFoodInCart(userId);
   }
 
   async getUserCart(userId: string): Promise<any> {
@@ -192,10 +172,31 @@ export class UsersService {
     //   },
     // ]);
     // return this.foodModel.populate(user, { path: 'foodItem' });
-    const user = await this.userModel
-      .findById(userId, { password: 0, refreshToken: 0 })
-      .populate('cart.foodItem');
-    return user.cart;
+    //////////////////////////////////////////////////////////////
+    // const user = await this.userModel
+    //   .findById(userId, { password: 0, refreshToken: 0 })
+    //   .populate('cart.foodItem');
+    // return user.cart;
+    ////////////////////////////////////////////////////////////
+    const user = await this.userModel.aggregate([
+      {
+        $match: {
+          _id: new mongoose.Types.ObjectId(userId),
+        },
+      },
+      { $unwind: '$cart' },
+      { $addFields: { foodItemId: { $toObjectId: '$cart.foodItem' } } },
+      {
+        $lookup: {
+          from: 'food',
+          localField: 'foodItemId',
+          foreignField: '_id',
+          as: 'cart.foodItem',
+        },
+      },
+    ]);
+
+    return user;
   }
 
   async addFoodItemsToCart(
