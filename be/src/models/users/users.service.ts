@@ -17,6 +17,7 @@ import {
 } from './user.entites';
 import { User, UserDocument } from './schemes/user.schema';
 import { Food, FoodDocument } from '../food/food.schema';
+import { CompleteCartInformation } from './types/types';
 
 const { NotFound, Conflict } = userExceptions;
 
@@ -149,36 +150,26 @@ export class UsersService {
     return totalNumberOfFoodInCart;
   }
 
-  async getUserCart(userId: string): Promise<any> {
-    // const user = await this.userModel.aggregate([
-    //   {
-    //     $match: {
-    //       _id: new mongoose.Types.ObjectId(userId),
-    //     },
-    //   },
-    //   { $unwind: '$cart' },
-    //   {
-    //     $group: {
-    //       _id: '$cart',
-    //       foodItemCounter: { $sum: 1 },
-    //     },
-    //   },
-    //   {
-    //     $project: {
-    //       _id: 0,
-    //       foodItem: '$_id',
-    //       foodItemCounter: 1,
-    //     },
-    //   },
-    // ]);
-    // return this.foodModel.populate(user, { path: 'foodItem' });
-    //////////////////////////////////////////////////////////////
-    // const user = await this.userModel
-    //   .findById(userId, { password: 0, refreshToken: 0 })
-    //   .populate('cart.foodItem');
-    // return user.cart;
-    ////////////////////////////////////////////////////////////
-    const user = await this.userModel.aggregate([
+  async addFoodToCartFromOrderPage(
+    userId: string,
+    foodId: string,
+  ): Promise<CompleteCartInformation> {
+    await this.addFoodItemsToCart(userId, foodId, 1);
+    return await this.getCompleteInformationAboutCart(userId);
+  }
+
+  async removeFoodFromCartFromOrderPage(
+    userId: string,
+    foodId: string,
+  ): Promise<CompleteCartInformation> {
+    await this.removeFoodItemsFromCart(userId, foodId, 1);
+    return await this.getCompleteInformationAboutCart(userId);
+  }
+
+  async getCompleteInformationAboutCart(
+    userId: string,
+  ): Promise<CompleteCartInformation> {
+    const [fullCartInfo] = await this.userModel.aggregate([
       {
         $match: {
           _id: new mongoose.Types.ObjectId(userId),
@@ -194,9 +185,44 @@ export class UsersService {
           as: 'cart.foodItem',
         },
       },
+      {
+        $project: {
+          foodItem: { $arrayElemAt: ['$cart.foodItem', 0] },
+          foodItemCounter: '$cart.foodItemCounter',
+        },
+      },
+      {
+        $group: {
+          _id: '$_id',
+          food: {
+            $push: '$$ROOT',
+          },
+          totalCost: {
+            $sum: {
+              $multiply: ['$foodItem.price', '$foodItemCounter'],
+            },
+          },
+          totalNumberOfFoodInCart: {
+            $sum: { $sum: '$foodItemCounter' },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+        },
+      },
     ]);
 
-    return user;
+    if (!fullCartInfo) {
+      return {
+        food: [],
+        totalCost: 0,
+        totalNumberOfFoodInCart: 0,
+      };
+    }
+
+    return fullCartInfo;
   }
 
   async addFoodItemsToCart(

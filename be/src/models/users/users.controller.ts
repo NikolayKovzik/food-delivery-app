@@ -23,6 +23,7 @@ import { AccessTokenGuard } from 'src/guards/accessToken.guard';
 import authResponses from '../auth/constants/swagger-responses';
 import responses from './constants/swagger-responses';
 import { UserDto } from './dto/user.dto';
+import { CompleteCartInformation } from './types/types';
 import { PublicUserEntity } from './user.entites';
 import { UsersService } from './users.service';
 
@@ -76,7 +77,7 @@ export class UsersController {
 
   @Get(':id/cart')
   async getUserCart(@Param('id') userId: string) {
-    return await this.usersService.getUserCart(userId);
+    return await this.usersService.getCompleteInformationAboutCart(userId);
   }
 
   @Patch(':userId/cart/:foodId/add-to-cart-from-main-page')
@@ -104,35 +105,22 @@ export class UsersController {
     );
   }
 
-  // @Patch(':userId/cart/:foodId/add-food-to-cart-from-order-page')
-  // async addFoodToCartFromOrderPage(
-  //   @Param('userId') userId: string,
-  //   @Param('foodId') foodId: string,
-  // ): Promise<number> {
-  //   return await this.usersService.addFoodToCartFromOrderPage(userId, foodId);
-  // }
-
-  // @Patch(':userId/cart/:foodId/remove-food-from-cart-from-order-page')
-  // async removeFoodFromCartFromOrderPage(
-  //   @Param('userId') userId: string,
-  //   @Param('foodId') foodId: string,
-  // ): Promise<number> {
-  //   return await this.usersService.removeFoodFromCartFromOrderPage(
-  //     userId,
-  //     foodId,
-  //   );
-  // }
-
-  @Patch(':userId/cart/:foodId/delete')
-  async removeFoodItemsFromCart(
+  @Patch(':userId/cart/:foodId/add-food-to-cart-from-order-page')
+  async addFoodToCartFromOrderPage(
     @Param('userId') userId: string,
     @Param('foodId') foodId: string,
-    @Query('amount') amountOfFoodItems: string,
-  ) {
-    return await this.usersService.removeFoodItemsFromCart(
+  ): Promise<CompleteCartInformation> {
+    return await this.usersService.addFoodToCartFromOrderPage(userId, foodId);
+  }
+
+  @Patch(':userId/cart/:foodId/remove-food-from-cart-from-order-page')
+  async removeFoodFromCartFromOrderPage(
+    @Param('userId') userId: string,
+    @Param('foodId') foodId: string,
+  ): Promise<CompleteCartInformation> {
+    return await this.usersService.removeFoodFromCartFromOrderPage(
       userId,
       foodId,
-      +amountOfFoodItems,
     );
   }
 
