@@ -1,13 +1,16 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose from 'mongoose';
+import { FoodItem, FoodItemSchema } from './food-item.schema';
 
 @Schema({ versionKey: false, _id: false })
 export class Cart {
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Food', required: true })
-  foodItem: string;
+  @Prop({ type: [FoodItemSchema], required: true })
+  foodItems: FoodItem[];
 
   @Prop({ type: Number, required: true })
-  foodItemCounter: number;
+  totalCost: number;
+
+  @Prop({ type: Number, required: true })
+  totalNumberOfFoodInCart: number;
 }
 
 export const CartSchema = SchemaFactory.createForClass(Cart);

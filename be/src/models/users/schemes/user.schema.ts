@@ -22,8 +22,8 @@ export class User {
   })
   favoriteFood: string[];
 
-  @Prop({ type: [CartSchema], required: true })
-  cart: Cart[];
+  @Prop({ type: CartSchema, required: true })
+  cart: Cart;
 }
 
 export type UserDocument = HydratedDocument<User>;

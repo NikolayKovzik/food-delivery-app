@@ -28,9 +28,22 @@ export class FullUserEntity {
   favoriteFood: string[];
 
   @ApiProperty({
-    example: { foodItemId: '644243d59a30fd843d831717', foodItemAmount: 3 },
+    example: {
+      foodItems: [
+        {
+          foodItem: '644243d59a30fd843d831717',
+          foodItemCounter: 3,
+        },
+        {
+          foodItem: '64427ad614c2de82f8b93893',
+          foodItemCounter: 2,
+        },
+      ],
+      totalNumberOfFoodInCart: 5,
+      totalCost: 35.5,
+    },
   })
-  cart: Cart[];
+  cart: Cart;
 }
 
 export class PartialUserEntity {
@@ -56,9 +69,22 @@ export class PartialUserEntity {
   favoriteFood?: string[];
 
   @ApiProperty({
-    example: { foodItemId: '644243d59a30fd843d831717', foodItemAmount: 3 },
+    example: {
+      foodItems: [
+        {
+          foodItem: '644243d59a30fd843d831717',
+          foodItemCounter: 3,
+        },
+        {
+          foodItem: '64427ad614c2de82f8b93893',
+          foodItemCounter: 2,
+        },
+      ],
+      totalNumberOfFoodInCart: 5,
+      totalCost: 35.5,
+    },
   })
-  cart?: Cart[];
+  cart?: Cart;
 }
 
 export class PublicUserEntity {
@@ -81,7 +107,20 @@ export class PublicUserEntity {
   favoriteFood: string[];
 
   @ApiProperty({
-    example: { foodItemId: '644243d59a30fd843d831717', foodItemAmount: 3 },
+    example: {
+      foodItems: [
+        {
+          foodItem: '644243d59a30fd843d831717',
+          foodItemCounter: 3,
+        },
+        {
+          foodItem: '64427ad614c2de82f8b93893',
+          foodItemCounter: 2,
+        },
+      ],
+      totalNumberOfFoodInCart: 5,
+      totalCost: 35.5,
+    },
   })
-  cart: Cart[];
+  cart: Cart;
 }

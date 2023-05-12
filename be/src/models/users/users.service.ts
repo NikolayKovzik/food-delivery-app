@@ -127,7 +127,8 @@ export class UsersService {
 
     await this.addFoodItemsToCart(userId, foodItemId, amountOfFoodItems);
 
-    return await this.getTotalNumberOfFoodInCart(userId);
+    // return await this.getTotalNumberOfFoodInCart(userId);
+    return 333;
   }
 
   async getTotalNumberOfFoodInCart(userId: string): Promise<number> {
@@ -233,12 +234,12 @@ export class UsersService {
     await this.userModel.updateOne({ _id: userId }, [
       {
         $set: {
-          cart: {
+          'cart.foodItems': {
             $cond: [
-              { $in: [foodItemId, '$cart.foodItem'] },
+              { $in: [foodItemId, '$cart.foodItems.foodItem'] },
               {
                 $map: {
-                  input: '$cart',
+                  input: '$cart.foodItems',
                   in: {
                     $cond: [
                       { $eq: ['$$this.foodItem', foodItemId] },
@@ -255,7 +256,7 @@ export class UsersService {
               },
               {
                 $concatArrays: [
-                  '$cart',
+                  '$cart.foodItems',
                   [
                     {
                       foodItem: foodItemId,
@@ -345,6 +346,11 @@ export class UsersService {
     );
     const newUser = await new this.userModel({
       ...body,
+      cart: {
+        foodItems: [],
+        totalCost: 0,
+        totalNumberOfFoodInCart: 0,
+      },
       password: hashedPassword,
     });
     return await newUser.save();
