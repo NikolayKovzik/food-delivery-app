@@ -162,9 +162,11 @@ export class UsersService {
   async removeFoodFromCartFromOrderPage(
     userId: string,
     foodId: string,
-  ): Promise<CompleteCartInformation> {
+  ): Promise<any> {
+    // ): Promise<CompleteCartInformation> {
     await this.removeFoodItemsFromCart(userId, foodId, 1);
-    return await this.getCompleteInformationAboutCart(userId);
+    // return await this.getCompleteInformationAboutCart(userId);
+    return 444;
   }
 
   async getCompleteInformationAboutCart(
@@ -291,9 +293,9 @@ export class UsersService {
     await this.userModel.updateOne({ _id: userId }, [
       {
         $set: {
-          cart: {
+          'cart.foodItems': {
             $reduce: {
-              input: '$cart',
+              input: '$cart.foodItems',
               initialValue: [],
               in: {
                 $cond: [
