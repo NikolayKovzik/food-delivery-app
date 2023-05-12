@@ -125,7 +125,7 @@ export class UsersService {
       throw new NotFoundException(userExceptions.NotFound);
     }
 
-    await this.addFoodItemsToCart(userId, foodItemId, amountOfFoodItems);
+    await this.addFoodItemsToCart(userId, foodItem, amountOfFoodItems);
 
     // return await this.getTotalNumberOfFoodInCart(userId);
     return 333;
@@ -155,7 +155,12 @@ export class UsersService {
     userId: string,
     foodId: string,
   ): Promise<CompleteCartInformation> {
-    await this.addFoodItemsToCart(userId, foodId, 1);
+    const foodItem = await this.foodModel.findById(foodId);
+
+    if (!foodItem) {
+      throw new NotFoundException(foodExceptions.NotFound);
+    }
+    await this.addFoodItemsToCart(userId, foodItem, 1);
     return await this.getCompleteInformationAboutCart(userId);
   }
 
@@ -230,21 +235,22 @@ export class UsersService {
 
   async addFoodItemsToCart(
     userId: string,
-    foodItemId: string,
+    foodItem: FoodDocument,
     amountOfFoodItems: number,
   ): Promise<void> {
+    const foodItemId = foodItem._id;
     await this.userModel.updateOne({ _id: userId }, [
       {
         $set: {
           'cart.foodItems': {
             $cond: [
-              { $in: [foodItemId, '$cart.foodItems.foodItem'] },
+              { $in: [foodItemId, '$cart.foodItems.foodItem._id'] },
               {
                 $map: {
                   input: '$cart.foodItems',
                   in: {
                     $cond: [
-                      { $eq: ['$$this.foodItem', foodItemId] },
+                      { $eq: ['$$this.foodItem._id', foodItemId] },
                       {
                         foodItem: '$$this.foodItem',
                         foodItemCounter: {
@@ -261,7 +267,7 @@ export class UsersService {
                   '$cart.foodItems',
                   [
                     {
-                      foodItem: foodItemId,
+                      foodItem: foodItem,
                       foodItemCounter: amountOfFoodItems,
                     },
                   ],
@@ -300,7 +306,7 @@ export class UsersService {
               in: {
                 $cond: [
                   {
-                    $eq: ['$$this.foodItem', foodItemId],
+                    $eq: ['$$this.foodItem._id', foodItem._id],
                   },
                   {
                     $cond: [
