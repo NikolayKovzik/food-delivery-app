@@ -23,7 +23,7 @@ import { AccessTokenGuard } from 'src/guards/accessToken.guard';
 import authResponses from '../auth/constants/swagger-responses';
 import responses from './constants/swagger-responses';
 import { UserDto } from './dto/user.dto';
-import { CompleteCartInformation } from './types/types';
+import { Cart } from './schemes/cart.schema';
 import { PublicUserEntity } from './user.entites';
 import { UsersService } from './users.service';
 
@@ -76,8 +76,8 @@ export class UsersController {
   }
 
   @Get(':id/cart')
-  async getUserCart(@Param('id') userId: string) {
-    return await this.usersService.getCompleteInformationAboutCart(userId);
+  async getUserCart(@Param('id') userId: string): Promise<Cart> {
+    return await this.usersService.getUserCart(userId);
   }
 
   @Patch(':userId/cart/:foodId/add-to-cart-from-main-page')
@@ -109,7 +109,7 @@ export class UsersController {
   async addFoodToCartFromOrderPage(
     @Param('userId') userId: string,
     @Param('foodId') foodId: string,
-  ): Promise<CompleteCartInformation> {
+  ): Promise<number> {
     return await this.usersService.addFoodToCartFromOrderPage(userId, foodId);
   }
 
@@ -117,7 +117,7 @@ export class UsersController {
   async removeFoodFromCartFromOrderPage(
     @Param('userId') userId: string,
     @Param('foodId') foodId: string,
-  ): Promise<CompleteCartInformation> {
+  ): Promise<number> {
     return await this.usersService.removeFoodFromCartFromOrderPage(
       userId,
       foodId,
