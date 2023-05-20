@@ -120,7 +120,7 @@ export class UsersService {
     return user.cart;
   }
 
-  async addFoodToCartAndGetTotalAmount(
+  async addFoodToCartAndGetCartInfo(
     userId: string,
     foodItemId: string,
     amountOfFoodItems: number,
@@ -139,20 +139,7 @@ export class UsersService {
     return await this.addFoodItemsToCart(userId, foodItem, amountOfFoodItems);
   }
 
-  async addFoodToCartFromOrderPage(
-    userId: string,
-    foodId: string,
-  ): Promise<any> {
-    const foodItem = await this.foodModel.findById(foodId);
-
-    if (!foodItem) {
-      throw new NotFoundException(foodExceptions.NotFound);
-    }
-
-    return await this.addFoodItemsToCart(userId, foodItem, 1);
-  }
-
-  async removeFoodFromCartFromOrderPage(
+  async removeFoodFromCartAndGetCartInfo(
     userId: string,
     foodItemId: string,
   ): Promise<any> {
@@ -176,146 +163,154 @@ export class UsersService {
     amountOfFoodItems: number,
   ): Promise<any> {
     const foodItemId = foodItem._id;
-    return await this.userModel.updateOne({ _id: userId }, [
-      {
-        $set: {
-          'cart.foodItems': {
-            $cond: [
-              { $in: [foodItemId, '$cart.foodItems.foodItem._id'] },
-              {
-                $map: {
-                  input: '$cart.foodItems',
-                  in: {
-                    $cond: [
-                      { $eq: ['$$this.foodItem._id', foodItemId] },
-                      {
-                        foodItem: '$$this.foodItem',
-                        foodItemCounter: {
-                          $add: ['$$this.foodItemCounter', amountOfFoodItems],
+    return await this.userModel.findOneAndUpdate(
+      { _id: userId },
+      [
+        {
+          $set: {
+            'cart.foodItems': {
+              $cond: [
+                { $in: [foodItemId, '$cart.foodItems.foodItem._id'] },
+                {
+                  $map: {
+                    input: '$cart.foodItems',
+                    in: {
+                      $cond: [
+                        { $eq: ['$$this.foodItem._id', foodItemId] },
+                        {
+                          foodItem: '$$this.foodItem',
+                          foodItemCounter: {
+                            $add: ['$$this.foodItemCounter', amountOfFoodItems],
+                          },
                         },
-                      },
-                      '$$this',
-                    ],
+                        '$$this',
+                      ],
+                    },
                   },
                 },
-              },
-              {
-                $concatArrays: [
-                  '$cart.foodItems',
-                  [
-                    {
-                      foodItem: foodItem,
-                      foodItemCounter: amountOfFoodItems,
-                    },
-                  ],
-                ],
-              },
-            ],
-          },
-        },
-      },
-      {
-        $set: {
-          'cart.totalCost': {
-            $reduce: {
-              input: '$cart.foodItems',
-              initialValue: 0,
-              in: {
-                $sum: [
-                  '$$value',
-                  {
-                    $multiply: [
-                      '$$this.foodItem.price',
-                      '$$this.foodItemCounter',
+                {
+                  $concatArrays: [
+                    '$cart.foodItems',
+                    [
+                      {
+                        foodItem: foodItem,
+                        foodItemCounter: amountOfFoodItems,
+                      },
                     ],
-                  },
-                ],
-              },
+                  ],
+                },
+              ],
             },
           },
-          'cart.totalNumberOfFoodInCart': {
-            $sum: { $sum: '$cart.foodItems.foodItemCounter' },
+        },
+        {
+          $set: {
+            'cart.totalCost': {
+              $reduce: {
+                input: '$cart.foodItems',
+                initialValue: 0,
+                in: {
+                  $sum: [
+                    '$$value',
+                    {
+                      $multiply: [
+                        '$$this.foodItem.price',
+                        '$$this.foodItemCounter',
+                      ],
+                    },
+                  ],
+                },
+              },
+            },
+            'cart.totalNumberOfFoodInCart': {
+              $sum: { $sum: '$cart.foodItems.foodItemCounter' },
+            },
           },
         },
-      },
-    ]);
+      ],
+      { returnDocument: 'after' },
+    );
   }
 
   async removeFoodItemsFromCart(
     userId: string,
     foodItemId: Types.ObjectId,
     amountOfFoodItems: number,
-  ): Promise<void> {
-    await this.userModel.updateOne({ _id: userId }, [
-      {
-        $set: {
-          'cart.foodItems': {
-            $reduce: {
-              input: '$cart.foodItems',
-              initialValue: [],
-              in: {
-                $cond: [
-                  {
-                    $eq: ['$$this.foodItem._id', foodItemId],
-                  },
-                  {
-                    $cond: [
-                      { $gt: ['$$this.foodItemCounter', amountOfFoodItems] },
-                      {
-                        $concatArrays: [
-                          '$$value',
-                          [
-                            {
-                              $mergeObjects: [
-                                '$$this',
-                                {
-                                  foodItemCounter: {
-                                    $subtract: [
-                                      '$$this.foodItemCounter',
-                                      amountOfFoodItems,
-                                    ],
+  ): Promise<any> {
+    return await this.userModel.findOneAndUpdate(
+      { _id: userId },
+      [
+        {
+          $set: {
+            'cart.foodItems': {
+              $reduce: {
+                input: '$cart.foodItems',
+                initialValue: [],
+                in: {
+                  $cond: [
+                    {
+                      $eq: ['$$this.foodItem._id', foodItemId],
+                    },
+                    {
+                      $cond: [
+                        { $gt: ['$$this.foodItemCounter', amountOfFoodItems] },
+                        {
+                          $concatArrays: [
+                            '$$value',
+                            [
+                              {
+                                $mergeObjects: [
+                                  '$$this',
+                                  {
+                                    foodItemCounter: {
+                                      $subtract: [
+                                        '$$this.foodItemCounter',
+                                        amountOfFoodItems,
+                                      ],
+                                    },
                                   },
-                                },
-                              ],
-                            },
+                                ],
+                              },
+                            ],
                           ],
-                        ],
-                      },
-                      '$$value',
-                    ],
-                  },
-                  { $concatArrays: ['$$value', ['$$this']] },
-                ],
+                        },
+                        '$$value',
+                      ],
+                    },
+                    { $concatArrays: ['$$value', ['$$this']] },
+                  ],
+                },
               },
             },
           },
         },
-      },
-      {
-        $set: {
-          'cart.totalCost': {
-            $reduce: {
-              input: '$cart.foodItems',
-              initialValue: 0,
-              in: {
-                $sum: [
-                  '$$value',
-                  {
-                    $multiply: [
-                      '$$this.foodItem.price',
-                      '$$this.foodItemCounter',
-                    ],
-                  },
-                ],
+        {
+          $set: {
+            'cart.totalCost': {
+              $reduce: {
+                input: '$cart.foodItems',
+                initialValue: 0,
+                in: {
+                  $sum: [
+                    '$$value',
+                    {
+                      $multiply: [
+                        '$$this.foodItem.price',
+                        '$$this.foodItemCounter',
+                      ],
+                    },
+                  ],
+                },
               },
             },
-          },
-          'cart.totalNumberOfFoodInCart': {
-            $sum: { $sum: '$cart.foodItems.foodItemCounter' },
+            'cart.totalNumberOfFoodInCart': {
+              $sum: { $sum: '$cart.foodItems.foodItemCounter' },
+            },
           },
         },
-      },
-    ]);
+      ],
+      { returnDocument: 'after' },
+    );
   }
 
   /*****************************************************/

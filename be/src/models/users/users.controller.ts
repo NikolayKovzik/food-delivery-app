@@ -84,8 +84,8 @@ export class UsersController {
   async addFoodToCartFromMainPage(
     @Param('userId') userId: string,
     @Param('foodId') foodId: string,
-  ): Promise<number> {
-    return await this.usersService.addFoodToCartAndGetTotalAmount(
+  ): Promise<any> {
+    return await this.usersService.addFoodToCartAndGetCartInfo(
       userId,
       foodId,
       1,
@@ -97,8 +97,8 @@ export class UsersController {
     @Param('userId') userId: string,
     @Param('foodId') foodId: string,
     @Query('amount') amountOfFoodItems: string,
-  ): Promise<number> {
-    return await this.usersService.addFoodToCartAndGetTotalAmount(
+  ): Promise<any> {
+    return await this.usersService.addFoodToCartAndGetCartInfo(
       userId,
       foodId,
       +amountOfFoodItems,
@@ -109,8 +109,12 @@ export class UsersController {
   async addFoodToCartFromOrderPage(
     @Param('userId') userId: string,
     @Param('foodId') foodId: string,
-  ): Promise<number> {
-    return await this.usersService.addFoodToCartFromOrderPage(userId, foodId);
+  ): Promise<any> {
+    return await this.usersService.addFoodToCartAndGetCartInfo(
+      userId,
+      foodId,
+      1,
+    );
   }
 
   @Patch(':userId/cart/:foodId/remove-food-from-cart-from-order-page')
@@ -118,7 +122,7 @@ export class UsersController {
     @Param('userId') userId: string,
     @Param('foodId') foodId: string,
   ): Promise<number> {
-    return await this.usersService.removeFoodFromCartFromOrderPage(
+    return await this.usersService.removeFoodFromCartAndGetCartInfo(
       userId,
       foodId,
     );
